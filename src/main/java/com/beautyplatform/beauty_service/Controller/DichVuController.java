@@ -100,7 +100,7 @@ public class DichVuController {
     }
 
     // sửa
-    @PutMapping("/{id}")
+    @PutMapping("/{maKM}")
     public ResponseEntity<ApiResponse> updateDichVu (@PathVariable("maDV") int maDV, @RequestBody DichVuDTO dichVuDTO) {
         try {
             // lúc submit chỉnh sửa, thì phải gửi cả id của đối tượng đó thì entity mới hiểu được là đang sửa ở đối tượng nào trong bảng
