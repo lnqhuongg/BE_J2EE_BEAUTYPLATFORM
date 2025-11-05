@@ -10,7 +10,7 @@ import lombok.*;
 @Builder
 @Getter
 @Setter
-public class NhaCungCap_HinhAnh {
+public class NhaCungCapHinhAnh {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

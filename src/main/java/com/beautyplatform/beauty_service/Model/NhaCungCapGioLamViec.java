@@ -11,7 +11,7 @@ import java.time.LocalTime;
 @Builder
 @Getter
 @Setter
-public class NhaCungCap_GioLamViec {
+public class NhaCungCapGioLamViec {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
