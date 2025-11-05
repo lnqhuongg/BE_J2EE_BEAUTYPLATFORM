@@ -2,21 +2,20 @@ package com.beautyplatform.beauty_service.Model;
 
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.LocalDate;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-
+@Table(name = "datlich")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Getter
 @Setter
-
-@Table(name = "datlich")
 public class DatLich {
+
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "maDL")
     private int maDL;
 
@@ -24,23 +23,15 @@ public class DatLich {
     @JoinColumn(name = "maKH", nullable = false)
     private KhachHang khachHang;
 
-    @ManyToOne
-    @JoinColumn(name = "maDV", nullable = false)
-    private DichVu dichVu;
+    @Column(name = "tongthoigian", nullable = false)
+    private int tongThoiGian;
 
-    @ManyToOne
-    @JoinColumn(name = "maNV", nullable = false)
-    private NhanVien nhanVien;
-
-    @Column(name = "ngaygiohen", nullable = false)
-    private LocalDateTime ngayGioHen;
-
-    @Column(name = "ghichu", nullable = false)
-    private String ghiChu;
-
-    @Column(name = "ngaytao", nullable = false)
-    private LocalDateTime ngayTao;
+    @Column(name = "tongtien", nullable = false, precision = 12, scale = 2)
+    private BigDecimal tongTien;
 
     @Column(name = "trangthai", nullable = false)
     private int trangThai;
+
+    @Column(name = "ngaytao", nullable = false)
+    private LocalDateTime ngayTao;
 }
