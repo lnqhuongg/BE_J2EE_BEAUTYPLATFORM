@@ -29,7 +29,7 @@ public class TaiKhoan {
     @Column(name = "loaiTK", nullable = false)
     private int loaiTK;
 
-    @Column(name = " ngaytao", nullable = false)
+    @Column(name = "ngaytao", nullable = false)
     private LocalDateTime ngayTao;
 
     @Column(name = "trangthai", nullable = false)

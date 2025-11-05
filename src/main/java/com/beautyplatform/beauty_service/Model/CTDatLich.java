@@ -2,6 +2,7 @@ package com.beautyplatform.beauty_service.Model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import java.time.LocalTime;
 
 @Entity
 @Table(name = "ctdatlich")
@@ -29,10 +30,10 @@ public class CTDatLich {
     private NhanVien nhanVien;
 
     @Column(name = "thoigianbatdau", nullable = false)
-    private java.sql.Time thoiGianBatDau;
+    private LocalTime thoiGianBatDau;
 
     @Column(name = "thoigianketthuc", nullable = false)
-    private java.sql.Time thoiGianKetThuc;
+    private LocalTime thoiGianKetThuc;
 
     @Column(name = "gia", nullable = false)
     private double gia;
