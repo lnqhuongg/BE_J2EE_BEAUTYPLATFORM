@@ -11,7 +11,6 @@ import lombok.*;
 @Setter
 @Table(name = "nhacungcap")
 public class NhaCungCap {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "maNCC")
@@ -33,7 +32,4 @@ public class NhaCungCap {
 
     @Column(name = "diachi", nullable = false)
     private String diaChi;
-
-    @Column(name = "trangthai", nullable = false)
-    private int trangThai;
 }

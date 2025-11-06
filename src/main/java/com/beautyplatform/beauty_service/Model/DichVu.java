@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 @Table(name = "dichvu")
 public class DichVu {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "maDV")
     private int maDV;
 

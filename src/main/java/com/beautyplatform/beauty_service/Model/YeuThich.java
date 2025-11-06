@@ -6,16 +6,15 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Getter
 @Setter
-
 @Table(name = "yeuthich")
 public class YeuThich {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "maYT")
     private int maYT;
 
@@ -24,8 +23,8 @@ public class YeuThich {
     private KhachHang khachHang;
 
     @ManyToOne
-    @JoinColumn(name = "maDV", nullable = false)
-    private DichVu dichVu;
+    @JoinColumn(name = "maNCC", nullable = false)
+    private NhaCungCap nhaCungCap;
 
     @Column(name = "ngaytao", nullable = false)
     private LocalDateTime ngayTao;

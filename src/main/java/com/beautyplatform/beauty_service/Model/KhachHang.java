@@ -13,9 +13,10 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 
-@Table(name = "khachhanng")
+@Table(name = "khachhang")
 public class KhachHang {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "maKH")
     private int maKH;
 
@@ -29,12 +30,12 @@ public class KhachHang {
     @Column(name = "gioitinh", nullable = false)
     private int gioiTinh;
 
-    @Column(name = " ngaysinh", nullable = false)
+    @Column(name = "ngaysinh", nullable = false)
     private LocalDateTime ngaySinh;
 
-    @Column(name = " sdt", nullable = false)
+    @Column(name = "sdt", nullable = false)
     private String sdt;
 
-    @Column(name = " diemthuong", nullable = false)
-    private int diemThuong;
+    @Column(name = "hinhanh", nullable = false)
+    private String hinhanh;
 }
