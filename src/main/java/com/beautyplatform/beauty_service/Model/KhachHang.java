@@ -3,6 +3,7 @@ package com.beautyplatform.beauty_service.Model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -31,11 +32,11 @@ public class KhachHang {
     private int gioiTinh;
 
     @Column(name = "ngaysinh", nullable = false)
-    private LocalDateTime ngaySinh;
+    private LocalDate ngaySinh;
 
     @Column(name = "sdt", nullable = false)
     private String sdt;
 
     @Column(name = "hinhanh", nullable = false)
-    private String hinhanh;
+    private String hinhAnh;
 }
