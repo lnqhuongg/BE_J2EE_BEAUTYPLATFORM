@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
-@CrossOrigin(origins = "http://localhost:5500")
 @RestController
 @RequestMapping("/khuyenmai")
 public class KhuyenMaiController {
@@ -49,7 +48,7 @@ public class KhuyenMaiController {
     public ResponseEntity<ApiResponse> getKhuyenMaiById(@PathVariable("id") int maKM) {
         try{
             Optional<KhuyenMaiDTO> khuyenMaiDTO = khuyenMaiService.getByKhuyenMaiId(maKM);
-            if(khuyenMaiDTO.isPresent()){
+            if(khuyenMaiDTO.isPresent()){   
                 apiResponse.setSuccess(true);
                 apiResponse.setMessage("Lấy mã khuyến mãi thành công!");
                 apiResponse.setData(khuyenMaiDTO);

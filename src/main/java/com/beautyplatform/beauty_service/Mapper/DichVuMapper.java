@@ -4,10 +4,6 @@ import com.beautyplatform.beauty_service.DTO.DichVuDTO.DichVuDTO;
 import com.beautyplatform.beauty_service.Model.DichVu;
 import com.beautyplatform.beauty_service.Model.LoaiDichVu;
 import com.beautyplatform.beauty_service.Model.NhaCungCap;
-import com.beautyplatform.beauty_service.Repository.LoaiDichVuRepository;
-import com.beautyplatform.beauty_service.Repository.NhaCungCapRepository;
-import jakarta.persistence.EntityNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public class DichVuMapper {
     public static DichVu toEntity(DichVuDTO dto, LoaiDichVu ldv, NhaCungCap ncc) {

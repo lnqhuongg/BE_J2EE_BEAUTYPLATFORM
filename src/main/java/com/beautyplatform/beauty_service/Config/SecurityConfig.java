@@ -39,6 +39,10 @@ public class SecurityConfig {
                         .requestMatchers("/dichvu/**").permitAll()
                         .requestMatchers("/loaidichvu/**").permitAll()
                         .requestMatchers("/nhacungcap/**").permitAll()
+                        .requestMatchers("/loaihinh/**").permitAll()
+                        .requestMatchers("/nhanvien/**").permitAll()
+                        .requestMatchers("/khuyenmai/**").permitAll()
+                        .requestMatchers("/khachhang/**").permitAll()
                         // Các endpoint khác cần authentication
                         .anyRequest().authenticated()
                 )
@@ -54,7 +58,10 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5500", "http://localhost:3000"));
+        configuration.setAllowedOrigins(Arrays.asList(
+                "http://localhost:5500",
+                "http://localhost:3000",
+                "http://127.0.0.1:5500"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);

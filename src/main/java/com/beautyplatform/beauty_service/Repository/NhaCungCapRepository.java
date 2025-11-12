@@ -14,7 +14,7 @@ public interface NhaCungCapRepository extends JpaRepository<NhaCungCap, Integer>
     @Query("SELECT ncc FROM NhaCungCap ncc " +
             "WHERE (:maNCC IS NULL OR ncc.maNCC = :maNCC) " +
             "AND (:maTK IS NULL OR ncc.taiKhoan.maTK = :maTK) " +
-            "AND (:maLH IS NULL OR ncc.loaiHinhKinhDoanh.maLoaiHinh = :maLH) " +
+            "AND (:maLH IS NULL OR ncc.loaiHinhKinhDoanh.maLH = :maLH) " +
             "AND (:tenNCC IS NULL OR ncc.tenNCC LIKE %:tenNCC%) " +
             "AND (:diaChi IS NULL OR ncc.diaChi LIKE %:diaChi%)")
     List<NhaCungCap> search(

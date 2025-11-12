@@ -92,9 +92,9 @@ public class AuthService implements IAuthService {
                         .taiKhoan(savedTK)
                         .hoTen(dto.getHoTen())
                         .gioiTinh(dto.getGioiTinh() != null ? dto.getGioiTinh() : 1)
-                        .ngaySinh(ngaySinh.atStartOfDay())
+                        .ngaySinh(LocalDate.now())
                         .sdt(dto.getSdt() != null ? dto.getSdt() : "")
-                        .hinhanh("")
+                        .hinhAnh("")
                         .build();
 
                 khachHangRepository.save(kh);
@@ -229,9 +229,9 @@ public class AuthService implements IAuthService {
                         .taiKhoan(taiKhoan)
                         .hoTen(email.split("@")[0]) // Tạm dùng email prefix
                         .gioiTinh(1)
-                        .ngaySinh(LocalDateTime.now())
+                        .ngaySinh(LocalDate.now())
                         .sdt("")
-                        .hinhanh("")
+                        .hinhAnh("")
                         .build();
 
                 khachHangRepository.save(kh);

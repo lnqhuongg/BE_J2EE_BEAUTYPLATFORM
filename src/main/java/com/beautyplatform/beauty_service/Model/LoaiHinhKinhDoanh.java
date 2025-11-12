@@ -16,10 +16,10 @@ public class LoaiHinhKinhDoanh {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "maLH")
-    private int maLoaiHinh;
+    private int maLH;
 
     @Column(name = "tenLH", nullable = false)
-    private String tenLoaiHinh;
+    private String tenLH;
 
     @Column(name = "trangthai", nullable = false)
     private int trangThai;

@@ -12,15 +12,11 @@ import java.util.Optional;
 @Repository
 public interface DichVuRepository extends JpaRepository<DichVu, Integer> {
 
-    @Query(value = """
-        SELECT *
-        FROM dichvu
-        WHERE
-            (:maDV IS NULL OR maDV = :maDV)
-            AND (:maLoaiDV IS NULL OR maLoaiDV = :maLoaiDV)
-            AND (:maNCC IS NULL OR maNCC = :maNCC)
-            AND (:tenDV IS NULL OR LIKE CONCAT('%', :tenDV, '%'))
-        """, nativeQuery = true)
+    @Query("SELECT d FROM DichVu d " +
+            "WHERE (:maDV IS NULL OR d.maDV = :maDV) " +
+            "AND (:maLDV IS NULL OR d.loaiDichVu.maLDV = :maLDV) " +
+            "AND (:maNCC IS NULL OR d.nhaCungCap.maNCC = :maNCC) " +
+            "AND (:tenDV IS NULL OR d.tenDV LIKE %:tenDV%)")
     public List<DichVu> search(
             @Param("maDV") int maDV,
             @Param("maLoaiDV") int maLoaiDV,

@@ -14,7 +14,7 @@ public class NhaCungCapMapper {
         return NhaCungCapDTO.builder()
                 .maNCC(entity.getMaNCC())
                 .maTK(entity.getTaiKhoan().getMaTK())
-                .maLH(entity.getLoaiHinhKinhDoanh().getMaLoaiHinh())
+                .maLH(entity.getLoaiHinhKinhDoanh().getMaLH())
                 .tenNCC(entity.getTenNCC())
                 .gioiThieu(entity.getGioiThieu())
                 .diaChi(entity.getDiaChi())

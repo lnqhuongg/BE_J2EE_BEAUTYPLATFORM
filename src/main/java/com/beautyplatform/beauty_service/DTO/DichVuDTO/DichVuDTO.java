@@ -1,8 +1,5 @@
 package com.beautyplatform.beauty_service.DTO.DichVuDTO;
 
-import com.beautyplatform.beauty_service.Model.LoaiDichVu;
-import com.beautyplatform.beauty_service.Model.NhaCungCap;
-
 import lombok.*;
 import java.math.BigDecimal;
 
