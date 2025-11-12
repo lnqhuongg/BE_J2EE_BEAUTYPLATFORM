@@ -1,6 +1,7 @@
 package com.beautyplatform.beauty_service.Service.Impl;
 
 import com.beautyplatform.beauty_service.DTO.DichVuDTO.DichVuDTO;
+import com.beautyplatform.beauty_service.DTO.DichVuDTO.DichVuFilterDTO;
 import com.beautyplatform.beauty_service.DTO.DichVuDTO.TimKiemDichVuDTO;
 import com.beautyplatform.beauty_service.Mapper.DichVuMapper;
 import com.beautyplatform.beauty_service.Model.DichVu;
@@ -10,6 +11,8 @@ import com.beautyplatform.beauty_service.Repository.DichVuRepository;
 import com.beautyplatform.beauty_service.Repository.LoaiDichVuRepository;
 import com.beautyplatform.beauty_service.Repository.NhaCungCapRepository;
 import com.beautyplatform.beauty_service.Service.Interface.IDichVuService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,19 +36,37 @@ public class DichVuService implements IDichVuService {
     // tránh xử dụng <List<DichVuDTO> (không có Optional) vì có thể trả về null, trường hợp truyền dữ liệu sai có thể bị lỗi tùm lum
     // nói chung là thống nhất trả về Optional (1 kiểu thôi) cho gọn với code nhanh hơn
     @Override
-    public Optional<List<DichVuDTO>> getAll(){
+    public Page<DichVuDTO> getAll(Pageable pageable) {
         try {
-            // lấy danh sách entity từ database
-            List<DichVu> listDVEntity = repository.findAll();
-            // map danh sách vừa lấy sang DTO, dùng stream() có sẵn trong Spring Boot
-            List<DichVuDTO> dtoList = listDVEntity.stream()
-                    .map(DichVuMapper::toDTO)
-                    .toList();
-            // trả về (gửi đến controller)
-            return Optional.of(dtoList);
+            // Lấy danh sách entity có phân trang
+            Page<DichVu> pageEntity = repository.findAll(pageable);
+
+            // Dùng map() để chuyển từng phần tử từ Entity -> DTO
+            return pageEntity.map(DichVuMapper::toDTO);
         } catch (Exception e) {
             System.err.println("Lỗi khi lấy danh sách dịch vụ: " + e.getMessage());
-            return Optional.empty();
+            return Page.empty(pageable);
+        }
+    }
+
+    // tìm kiếm và bộ lọc
+    @Override
+    public Page<DichVuDTO> filter(DichVuFilterDTO filter, Pageable pageable) {
+        try {
+            Page<DichVu> pageEntity = repository.filterDichVu(
+                    filter.getMaLoaiDichVu(),
+                    filter.getMaNhaCungCap(),
+                    filter.getTenDV(),
+                    filter.getMinGia(),
+                    filter.getMaxGia(),
+                    filter.getTrangThai(),
+                    pageable
+            );
+
+            return pageEntity.map(DichVuMapper::toDTO);
+        } catch (Exception e) {
+            System.err.println("Lỗi khi lọc dịch vụ: " + e.getMessage());
+            return Page.empty(pageable);
         }
     }
 
@@ -63,26 +84,6 @@ public class DichVuService implements IDichVuService {
             return Optional.of(DichVuMapper.toDTO(dichVu));
         } catch (Exception e) {
             System.err.println("Lỗi: " + e.getMessage() + "khi tìm dịch vụ có mã: " + maDV);
-            return Optional.empty();
-        }
-    }
-
-    // tìm kiếm và bộ lọc
-    @Override
-    public Optional<List<DichVuDTO>> search(TimKiemDichVuDTO dichVuDTO){
-        try {
-            List<DichVu> listDVEntity = repository.search(
-                    dichVuDTO.getMaDV(),
-                    dichVuDTO.getMaLDV(),
-                    dichVuDTO.getMaNCC(),
-                    dichVuDTO.getTenDV()
-            );
-            List<DichVuDTO> dtoList = listDVEntity.stream()
-                    .map(DichVuMapper::toDTO)
-                    .toList();
-            return Optional.of(dtoList);
-        } catch (Exception e) {
-            System.err.println("Lỗi khi tìm kiếm dịch vụ: " + e.getMessage());
             return Optional.empty();
         }
     }

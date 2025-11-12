@@ -1,9 +1,13 @@
 package com.beautyplatform.beauty_service.Controller;
 
 import com.beautyplatform.beauty_service.DTO.DichVuDTO.DichVuDTO;
+import com.beautyplatform.beauty_service.DTO.DichVuDTO.DichVuFilterDTO;
 import com.beautyplatform.beauty_service.Helper.ApiResponse;
 import com.beautyplatform.beauty_service.Service.Interface.IDichVuService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,30 +25,23 @@ public class DichVuController {
     @Autowired
     private ApiResponse apiResponse;
 
-    // lấy tất cả, danh sách dịch vụ
     @GetMapping
-    public ResponseEntity<ApiResponse> getAllDichVu() {
-        try {
-            // Gọi service để lấy danh sách dịch vụ
-            Optional<List<DichVuDTO>> listDichVuDTO = dichVuService.getAll();
-            // Nếu Optional có dữ liệu và danh sách không rỗng
-            if (listDichVuDTO.isPresent() && !listDichVuDTO.get().isEmpty()) {
-                apiResponse.setSuccess(true);
-                apiResponse.setMessage("Lấy danh sách dịch vụ thành công!");
-                apiResponse.setData(listDichVuDTO.get());
-                return ResponseEntity.ok(apiResponse); // HTTP 200
-            } else {
-                apiResponse.setSuccess(false);
-                apiResponse.setMessage("Không có dữ liệu dịch vụ nào!");
-                apiResponse.setData(null);
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(apiResponse); // HTTP 204
-            }
-        } catch (Exception e) {
-            apiResponse.setSuccess(false);
-            apiResponse.setMessage("Đã xảy ra lỗi: " + e.getMessage());
-            apiResponse.setData(null);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse); // HTTP 500
-        }
+    public ResponseEntity<Page<DichVuDTO>> getAll(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<DichVuDTO> result = dichVuService.getAll(pageable);
+        return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/filter")
+    public ResponseEntity<Page<DichVuDTO>> filter(
+            @RequestBody DichVuFilterDTO filter,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<DichVuDTO> result = dichVuService.filter(filter, pageable);
+        return ResponseEntity.ok(result);
     }
 
     // lấy theo id (sử dụng cho sửa hoặc xem chi tiết)
