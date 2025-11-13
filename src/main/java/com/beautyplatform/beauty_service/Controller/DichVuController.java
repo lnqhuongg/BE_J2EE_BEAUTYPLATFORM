@@ -1,14 +1,17 @@
 package com.beautyplatform.beauty_service.Controller;
 
 import com.beautyplatform.beauty_service.DTO.DichVuDTO.DichVuDTO;
+import com.beautyplatform.beauty_service.DTO.DichVuDTO.TimKiemDichVuDTO;
 import com.beautyplatform.beauty_service.Helper.ApiResponse;
 import com.beautyplatform.beauty_service.Service.Interface.IDichVuService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Optional;
 
 
@@ -22,16 +25,20 @@ public class DichVuController {
     private ApiResponse apiResponse;
 
     // lấy tất cả, danh sách dịch vụ
+    // @ModelAttribute hỗ trợ tìm kiếm (query bằng đường dẫn VD: /dichvu?page=0&size=5&maDV=1&tenDV=“Cắt tóc”&maLDV=2)
     @GetMapping
-    public ResponseEntity<ApiResponse> getAllDichVu() {
+    public ResponseEntity<ApiResponse> getAllDichVu(@RequestParam(defaultValue = "0") int page,
+                                                    @RequestParam(defaultValue = "5") int size,
+                                                    @ModelAttribute TimKiemDichVuDTO timKiemDichVuDTO) {
         try {
-            // Gọi service để lấy danh sách dịch vụ
-            Optional<List<DichVuDTO>> listDichVuDTO = dichVuService.getAll();
+            Pageable pageable = PageRequest.of(page, size);
+            Page<DichVuDTO> pageResult = dichVuService.getAllAndSearchWithPage(timKiemDichVuDTO, pageable);
+
             // Nếu Optional có dữ liệu và danh sách không rỗng
-            if (listDichVuDTO.isPresent() && !listDichVuDTO.get().isEmpty()) {
+            if (pageResult != null && pageResult.hasContent()) {
                 apiResponse.setSuccess(true);
                 apiResponse.setMessage("Lấy danh sách dịch vụ thành công!");
-                apiResponse.setData(listDichVuDTO.get());
+                apiResponse.setData(pageResult);
                 return ResponseEntity.ok(apiResponse); // HTTP 200
             } else {
                 apiResponse.setSuccess(false);

@@ -1,12 +1,17 @@
 package com.beautyplatform.beauty_service.Service.Impl;
 
 import com.beautyplatform.beauty_service.DTO.LoaiDichVuDTO.LoaiDichVuDTO;
+import com.beautyplatform.beauty_service.DTO.LoaiHinhKinhDoanhDTO.LoaiHinhKinhDoanhDTO;
 import com.beautyplatform.beauty_service.Mapper.LoaiDichVuMapper;
+import com.beautyplatform.beauty_service.Mapper.LoaiHinhKinhDoanhMapper;
 import com.beautyplatform.beauty_service.Model.LoaiDichVu;
+import com.beautyplatform.beauty_service.Model.LoaiHinhKinhDoanh;
 import com.beautyplatform.beauty_service.Repository.LoaiDichVuRepository;
 import com.beautyplatform.beauty_service.Service.Interface.ILoaiDichVuService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,16 +25,24 @@ public class LoaiDichVuService implements ILoaiDichVuService {
 
     // ✅ Lấy toàn bộ loại dịch vụ
     @Override
-    public Optional<List<LoaiDichVuDTO>> getAll() {
+    public Page<LoaiDichVuDTO> getAll(Pageable pageable) {
         try {
-            List<LoaiDichVu> entities = repository.findAll();
-            List<LoaiDichVuDTO> dtoList = entities.stream()
-                    .map(LoaiDichVuMapper::toDTO)
-                    .toList();
-            return Optional.of(dtoList);
+            Page<LoaiDichVu> pageEntity = repository.findAll(pageable);
+            return pageEntity.map(LoaiDichVuMapper::toDTO);
         } catch (Exception e) {
             System.err.println("Lỗi khi lấy danh sách loại dịch vụ: " + e.getMessage());
-            return Optional.empty();
+            return Page.empty(pageable);
+        }
+    }
+
+    @Override
+    public Page<LoaiDichVuDTO> searchWithPage(String keyword, Pageable pageable) {
+        try {
+            Page<LoaiDichVu> pageEntity = repository.searchWithPage(keyword, pageable);
+            return pageEntity.map(LoaiDichVuMapper::toDTO);
+        } catch (Exception e) {
+            System.err.println("Lỗi khi tìm kiếm có phân trang: " + e.getMessage());
+            return Page.empty(pageable);
         }
     }
 
@@ -91,22 +104,6 @@ public class LoaiDichVuService implements ILoaiDichVuService {
             return Optional.of(LoaiDichVuMapper.toDTO(existing));
         } catch (Exception e) {
             System.err.println("Lỗi khi xóa loại dịch vụ: " + e.getMessage());
-            return Optional.empty();
-        }
-    }
-
-    // ✅ Tìm kiếm loại dịch vụ theo tên hoặc trạng thái
-    @Override
-    public Optional<List<LoaiDichVuDTO>> search(String keyword, Integer trangThai) {
-        try {
-            // Giả sử bạn đã có custom query trong repository
-            List<LoaiDichVu> results = repository.search(keyword, trangThai);
-            List<LoaiDichVuDTO> dtoList = results.stream()
-                    .map(LoaiDichVuMapper::toDTO)
-                    .toList();
-            return Optional.of(dtoList);
-        } catch (Exception e) {
-            System.err.println("Lỗi khi tìm kiếm loại dịch vụ: " + e.getMessage());
             return Optional.empty();
         }
     }

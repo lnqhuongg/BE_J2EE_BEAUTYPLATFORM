@@ -18,7 +18,7 @@ public class DichVu {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "maDV")
-    private int maDV;
+    private Integer maDV;
 
     @ManyToOne
     @JoinColumn(name = "maLDV", nullable = false)

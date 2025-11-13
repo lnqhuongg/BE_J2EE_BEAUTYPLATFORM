@@ -1,6 +1,8 @@
 package com.beautyplatform.beauty_service.Repository;
 
 import com.beautyplatform.beauty_service.Model.DichVu;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -12,15 +14,27 @@ import java.util.Optional;
 @Repository
 public interface DichVuRepository extends JpaRepository<DichVu, Integer> {
 
-    @Query("SELECT d FROM DichVu d " +
-            "WHERE (:maDV IS NULL OR d.maDV = :maDV) " +
-            "AND (:maLDV IS NULL OR d.loaiDichVu.maLDV = :maLDV) " +
-            "AND (:maNCC IS NULL OR d.nhaCungCap.maNCC = :maNCC) " +
-            "AND (:tenDV IS NULL OR d.tenDV LIKE %:tenDV%)")
-    public List<DichVu> search(
-            @Param("maDV") int maDV,
-            @Param("maLoaiDV") int maLoaiDV,
-            @Param("maNCC") int maNCC,
-            @Param("tenDV") String tenDV
+    @Query(
+            value = """
+            SELECT d FROM DichVu d
+            WHERE (:maDV IS NULL OR d.maDV = :maDV)
+              AND (:maLDV IS NULL OR d.loaiDichVu.maLDV = :maLDV)
+              AND (:tenDV IS NULL OR LOWER(d.tenDV) LIKE LOWER(CONCAT('%', :tenDV, '%')))
+              AND (:thoiluong IS NULL OR d.thoiLuong = :thoiluong)
+        """,
+            countQuery = """
+            SELECT COUNT(d) FROM DichVu d
+            WHERE (:maDV IS NULL OR d.maDV = :maDV)
+              AND (:maLDV IS NULL OR d.loaiDichVu.maLDV = :maLDV)
+              AND (:tenDV IS NULL OR LOWER(d.tenDV) LIKE LOWER(CONCAT('%', :tenDV, '%')))
+              AND (:thoiluong IS NULL OR d.thoiLuong = :thoiluong)
+        """
+    )
+    Page<DichVu> searchWithPage(
+            @Param("maDV") Integer maDV,
+            @Param("maLDV") Integer maLDV,
+            @Param("tenDV") String tenDV,
+            @Param("thoiluong") Integer thoiluong,
+            Pageable pageable
     );
 }
