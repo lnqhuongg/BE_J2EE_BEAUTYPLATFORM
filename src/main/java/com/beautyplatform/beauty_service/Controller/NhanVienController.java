@@ -1,5 +1,6 @@
 package com.beautyplatform.beauty_service.Controller;
 
+import com.beautyplatform.beauty_service.DTO.KhachHangDTO.KhachHangDTO;
 import com.beautyplatform.beauty_service.DTO.NhanVienDTO.NhanVienDTO;
 import com.beautyplatform.beauty_service.DTO.NhanVienDTO.TimKiemNhanVienDTO;
 import com.beautyplatform.beauty_service.Helper.ApiResponse;
@@ -30,12 +31,20 @@ public class NhanVienController {
     public ResponseEntity<ApiResponse> getAllNhanVien(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size,
-            @ModelAttribute TimKiemNhanVienDTO timKiemNhanVienDTO
+            @RequestParam(required = false) String keyword
     ) {
         try {
             Pageable pageable = PageRequest.of(page, size);
-            Page<NhanVienDTO> pageResult =
-                    nhanVienService.getAllAndSearchWithPage(timKiemNhanVienDTO, pageable);
+            Page<NhanVienDTO> pageResult;
+
+            // nếu có keyword thì tìm kiếm
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                pageResult = nhanVienService.searchWithPage(keyword.trim(), pageable);
+            }
+            // nếu không có keyword thì lấy tất cả
+            else {
+                pageResult = nhanVienService.getAll(pageable);
+            }
 
             if (pageResult != null && pageResult.hasContent()) {
                 apiResponse.setSuccess(true);

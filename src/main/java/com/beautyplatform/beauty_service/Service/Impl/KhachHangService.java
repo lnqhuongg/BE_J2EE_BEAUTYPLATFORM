@@ -30,24 +30,7 @@ public class KhachHangService implements IKhachHangService {
 
     @Autowired
     private TaiKhoanRepository taiKhoanRepository;
-//    Lọc
-//    @Override
-//    public Page<KhachHangDTO> getAllSearchWithPage(TimKiemKhachHangDTO timKiemKhachHangDTO, Pageable pageable) {
-//        try {
-//            Page<KhachHang> pageEntity = repository.searchWithPage(
-//                    timKiemKhachHangDTO.getMaKH(),
-//                    timKiemKhachHangDTO.getMaTK(),
-//                    timKiemKhachHangDTO.getHoTen(),
-//                    timKiemKhachHangDTO.getSdt(),
-//
-//                    pageable
-//            );
-//            return pageEntity.map(KhachHangMapper::toDTO);
-//        }catch (Exception e) {
-//            System.err.println("Lỗi khi tìm kiếm có phân trang" + e.getMessage());
-//            return Page.empty(pageable);
-//        }
-//    }
+
     //lấy toàn bộ khách hàng
     @Override
     public Page<KhachHangDTO> getAll(Pageable pageable) {
@@ -118,25 +101,5 @@ public class KhachHangService implements IKhachHangService {
     //KTSDT
     public boolean isExistPhoneNumber(String sdt) {
         return repository.existsBySdt(sdt);
-    }
-
-    //search
-    public Optional<List<KhachHangDTO>> search(TimKiemKhachHangDTO timKiemKhachHangDTO){
-        try{
-            List<KhachHang>  entities = repository.search(
-                    timKiemKhachHangDTO.getMaKH(),
-                    timKiemKhachHangDTO.getMaTK(),
-                    timKiemKhachHangDTO.getHoTen(),
-                    timKiemKhachHangDTO.getSdt()
-            );
-
-            List<KhachHangDTO> dtoList = entities.stream()
-                    .map(KhachHangMapper::toDTO)
-                    .toList();
-            return Optional.of(dtoList);
-        } catch (Exception e) {
-            System.err.println("Lỗi khi tìm kiếm khách hàng");
-            return Optional.empty();
-        }
     }
 }

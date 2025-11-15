@@ -45,10 +45,10 @@ public class NhaCungCapService implements INhaCungCapService {
         try {
             Page<NhaCungCap> pageEntity = repository.searchWithPage(
                     timKiemNhaCungCapDTO.getMaNCC(),
-                    timKiemNhaCungCapDTO.getMaTK(),
                     timKiemNhaCungCapDTO.getMaLH(),
                     timKiemNhaCungCapDTO.getTenNCC(),
                     timKiemNhaCungCapDTO.getDiaChi(),
+                    timKiemNhaCungCapDTO.getEmail(),
                     pageable
             );
 

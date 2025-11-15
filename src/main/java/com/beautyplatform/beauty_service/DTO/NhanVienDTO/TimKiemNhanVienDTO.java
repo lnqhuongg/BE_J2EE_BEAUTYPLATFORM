@@ -9,8 +9,6 @@ import lombok.*;
 @Builder
 public class TimKiemNhanVienDTO {
     private Integer maNV;
-    private Integer maNCC;
     private String hoTen;
-    private Integer gioiTinh;
     private Integer trangThai;
 }

@@ -1,8 +1,11 @@
 package com.beautyplatform.beauty_service.Service.Impl;
 
+import com.beautyplatform.beauty_service.DTO.KhachHangDTO.KhachHangDTO;
 import com.beautyplatform.beauty_service.DTO.NhanVienDTO.NhanVienDTO;
 import com.beautyplatform.beauty_service.DTO.NhanVienDTO.TimKiemNhanVienDTO;
+import com.beautyplatform.beauty_service.Mapper.KhachHangMapper;
 import com.beautyplatform.beauty_service.Mapper.NhanVienMapper;
+import com.beautyplatform.beauty_service.Model.KhachHang;
 import com.beautyplatform.beauty_service.Model.NhaCungCap;
 import com.beautyplatform.beauty_service.Model.NhanVien;
 import com.beautyplatform.beauty_service.Repository.NhaCungCapRepository;
@@ -28,22 +31,23 @@ public class NhanVienService implements INhanVienService {
     private NhaCungCapRepository nhaCungCapRepository;
 
     @Override
-    public Page<NhanVienDTO> getAllAndSearchWithPage(TimKiemNhanVienDTO timKiemNhanVienDTO,
-                                                     Pageable pageable) {
+    public Page<NhanVienDTO> getAll(Pageable pageable) {
         try {
-            Page<NhanVien> pageEntity = repository.searchWithPage(
-                    timKiemNhanVienDTO.getMaNV(),
-                    timKiemNhanVienDTO.getMaNCC(),
-                    timKiemNhanVienDTO.getHoTen(),
-                    timKiemNhanVienDTO.getGioiTinh(),
-                    timKiemNhanVienDTO.getTrangThai(),
-                    pageable
-            );
-
+            Page<NhanVien> pageEntity = repository.findAll(pageable);
             return pageEntity.map(NhanVienMapper::toDTO);
-
         } catch (Exception e) {
-            System.err.println("Lỗi khi tìm kiếm nhân viên có phân trang: " + e.getMessage());
+            System.err.println("Lỗi khi lấy danh sách khách hàng: " + e.getMessage());
+            return Page.empty(pageable);
+        }
+    }
+
+    @Override
+    public Page<NhanVienDTO> searchWithPage(String keyword, Pageable pageable) {
+        try {
+            Page<NhanVien> pageEntity = repository.searchWithPage(keyword, pageable);
+            return pageEntity.map(NhanVienMapper::toDTO);
+        } catch (Exception e) {
+            System.err.println("Lỗi khi tìm kiếm khách hàng có phân trang: " + e.getMessage());
             return Page.empty(pageable);
         }
     }

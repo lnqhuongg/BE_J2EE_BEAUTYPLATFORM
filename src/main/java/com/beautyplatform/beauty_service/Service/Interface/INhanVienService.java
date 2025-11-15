@@ -18,11 +18,10 @@ public interface INhanVienService {
     // Xóa (hoặc cập nhật trạng thái nhân viên)
     public Optional<NhanVienDTO> delete(NhanVienDTO nhanVienDTO);
 
+    Page<NhanVienDTO> searchWithPage(String keyword, Pageable pageable);
 
     // Lấy thông tin nhân viên theo mã (dùng khi mở modal chỉnh sửa)
     public Optional<NhanVienDTO> getByNhanVienId(int id);
 
-
-    Page<NhanVienDTO> getAllAndSearchWithPage(TimKiemNhanVienDTO timKiemNhanVienDTO,
-                                              Pageable pageable);
+    Page<NhanVienDTO> getAll(Pageable pageable);
 }

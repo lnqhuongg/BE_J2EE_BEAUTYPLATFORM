@@ -12,20 +12,16 @@ import org.springframework.data.domain.Pageable;
 
 public interface IKhachHangService {
     //tim theo id
-    public Optional<KhachHangDTO> getByKhachHangId(int id);
+    Optional<KhachHangDTO> getByKhachHangId(int id);
     //getall
-    public  Page<KhachHangDTO> getAll(Pageable pageable);
+    Page<KhachHangDTO> getAll(Pageable pageable);
     //sua
-    public Optional<KhachHangDTO> update(KhachHangDTO khachHangDTO);
+    Optional<KhachHangDTO> update(KhachHangDTO khachHangDTO);
     //them
-    public Optional<KhachHangDTO> add(KhachHangDTO khachHangDTO);
-//    //xoa
-//    public  Optional<KhachHangDTO> delete(KhachHangDTO KhachHangDTO);
+    Optional<KhachHangDTO> add(KhachHangDTO khachHangDTO);
+    //    //xoa
+    //      Optional<KhachHangDTO> delete(KhachHangDTO KhachHangDTO);
     //ktSDT
-    public boolean isExistPhoneNumber(String sdt);
-    //search
-//    Optional<List<KhachHangDTO>> search(TimKiemKhachHangDTO timKiemKhachHangDTO);
-
-//    Page<KhachHangDTO> getAllSearchWithPage(TimKiemKhachHangDTO timKiemKhachHangDTO, Pageable pageable);
+    boolean isExistPhoneNumber(String sdt);
     Page<KhachHangDTO> searchWithPage(String keyword, Pageable pageable);
 }

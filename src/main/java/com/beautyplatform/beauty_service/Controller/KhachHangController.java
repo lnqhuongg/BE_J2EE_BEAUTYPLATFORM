@@ -24,39 +24,6 @@ public class KhachHangController {
 
     @Autowired
     private ApiResponse apiResponse;
-    //getall phân trang lọc
-//    @GetMapping
-//    public ResponseEntity<ApiResponse> getAllKhachHang(
-//            @RequestParam(defaultValue = "0") int page,
-//            @RequestParam(defaultValue = "5") int size,
-//            @ModelAttribute TimKiemKhachHangDTO timKiemKhachHangDTO) {
-//        try {
-//            // Tạo Pageable từ page & size
-//            Pageable pageable = PageRequest.of(page, size);
-//
-//            // Gọi service phân trang + search
-//            Page<KhachHangDTO> pageResult =
-//                    khachHangService.getAllSearchWithPage(timKiemKhachHangDTO, pageable);
-//
-//            // Nếu có dữ liệu
-//            if (pageResult != null && pageResult.hasContent()) {
-//                apiResponse.setSuccess(true);
-//                apiResponse.setMessage("Lấy danh sách khách hàng thành công!");
-//                apiResponse.setData(pageResult); // trả luôn Page để FE dùng totalPages, totalElements,...
-//                return ResponseEntity.ok(apiResponse); // HTTP 200
-//            } else {
-//                apiResponse.setSuccess(false);
-//                apiResponse.setMessage("Không có dữ liệu khách hàng nào!");
-//                apiResponse.setData(null);
-//                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(apiResponse); // HTTP 204
-//            }
-//        } catch (Exception e) {
-//            apiResponse.setSuccess(false);
-//            apiResponse.setMessage("Đã xảy ra lỗi: " + e.getMessage());
-//            apiResponse.setData(null);
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse); // HTTP 500
-//        }
-//    }
 
 // Lấy tất cả khách hàng hoặc tìm kiếm bằng keyword
     @GetMapping
