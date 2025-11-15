@@ -4,17 +4,21 @@ import com.beautyplatform.beauty_service.DTO.NhaCungCapDTO.NhaCungCapDTO;
 import com.beautyplatform.beauty_service.DTO.NhaCungCapDTO.NhaCungCapGioLamViecDTO;
 import com.beautyplatform.beauty_service.DTO.NhaCungCapDTO.NhaCungCapHinhAnhDTO;
 import com.beautyplatform.beauty_service.DTO.NhaCungCapDTO.TimKiemNhaCungCapDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface INhaCungCapService {
     // CRUD cơ bản
+    Page<NhaCungCapDTO> getAllAndSearchWithPage(TimKiemNhaCungCapDTO timKiemNhaCungCapDTO,
+                                                Pageable pageable);
     Optional<NhaCungCapDTO> add(NhaCungCapDTO nhaCungCapDTO);
     Optional<NhaCungCapDTO> update(NhaCungCapDTO nhaCungCapDTO);
-    Optional<List<NhaCungCapDTO>> getAll();
+
     Optional<NhaCungCapDTO> getById(int maNCC);
-    Optional<List<NhaCungCapDTO>> search(TimKiemNhaCungCapDTO timKiemDTO);
+
 
     // Quản lý giờ làm việc
     Optional<NhaCungCapGioLamViecDTO> addGioLamViec(NhaCungCapGioLamViecDTO dto);

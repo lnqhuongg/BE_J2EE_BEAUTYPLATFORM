@@ -2,6 +2,7 @@ package com.beautyplatform.beauty_service.Service.Impl;
 
 import com.beautyplatform.beauty_service.DTO.KhachHangDTO.KhachHangDTO;
 import com.beautyplatform.beauty_service.DTO.KhachHangDTO.TimKiemKhachHangDTO;
+import com.beautyplatform.beauty_service.Helper.ApiResponse;
 import com.beautyplatform.beauty_service.Mapper.KhachHangMapper;
 import com.beautyplatform.beauty_service.Model.KhachHang;
 import com.beautyplatform.beauty_service.Model.TaiKhoan;
@@ -10,7 +11,13 @@ import com.beautyplatform.beauty_service.Repository.TaiKhoanRepository;
 import com.beautyplatform.beauty_service.Service.Interface.IKhachHangService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,21 +30,47 @@ public class KhachHangService implements IKhachHangService {
 
     @Autowired
     private TaiKhoanRepository taiKhoanRepository;
-    //getall
+//    Lọc
+//    @Override
+//    public Page<KhachHangDTO> getAllSearchWithPage(TimKiemKhachHangDTO timKiemKhachHangDTO, Pageable pageable) {
+//        try {
+//            Page<KhachHang> pageEntity = repository.searchWithPage(
+//                    timKiemKhachHangDTO.getMaKH(),
+//                    timKiemKhachHangDTO.getMaTK(),
+//                    timKiemKhachHangDTO.getHoTen(),
+//                    timKiemKhachHangDTO.getSdt(),
+//
+//                    pageable
+//            );
+//            return pageEntity.map(KhachHangMapper::toDTO);
+//        }catch (Exception e) {
+//            System.err.println("Lỗi khi tìm kiếm có phân trang" + e.getMessage());
+//            return Page.empty(pageable);
+//        }
+//    }
+    //lấy toàn bộ khách hàng
     @Override
-    public Optional<List<KhachHangDTO>> getAll(){
-        try{
-            List<KhachHang> listKHEntity = repository.findAll();
-
-            List<KhachHangDTO> dtoList = listKHEntity.stream()
-                    .map(KhachHangMapper::toDTO)
-                    .toList();
-            return Optional.of(dtoList);
-        }catch(Exception e) {
-            System.err.println("Lỗi khi lấy danh sách khuyến mãi: " + e.getMessage());
-            return Optional.empty();
+    public Page<KhachHangDTO> getAll(Pageable pageable) {
+        try {
+            Page<KhachHang> pageEntity = repository.findAll(pageable);
+            return pageEntity.map(KhachHangMapper::toDTO);
+        } catch (Exception e) {
+            System.err.println("Lỗi khi lấy danh sách khách hàng: " + e.getMessage());
+            return Page.empty(pageable);
         }
     }
+
+    @Override
+    public Page<KhachHangDTO> searchWithPage(String keyword, Pageable pageable) {
+        try {
+            Page<KhachHang> pageEntity = repository.searchWithPage(keyword, pageable);
+            return pageEntity.map(KhachHangMapper::toDTO);
+        } catch (Exception e) {
+            System.err.println("Lỗi khi tìm kiếm khách hàng có phân trang: " + e.getMessage());
+            return Page.empty(pageable);
+        }
+    }
+
     //theo id
     @Override
     public Optional<KhachHangDTO> getByKhachHangId(int maKH){

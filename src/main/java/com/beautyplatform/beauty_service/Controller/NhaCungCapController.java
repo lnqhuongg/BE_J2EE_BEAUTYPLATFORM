@@ -10,6 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,28 +29,34 @@ public class NhaCungCapController {
 
     // ==================== CRUD NHÀ CUNG CẤP ====================
 
-    // Lấy tất cả nhà cung cấp
     @GetMapping
-    public ResponseEntity<ApiResponse> getAllNhaCungCap() {
+    public ResponseEntity<ApiResponse> getAllNhaCungCap(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @ModelAttribute TimKiemNhaCungCapDTO timKiemNhaCungCapDTO
+    ) {
         try {
-            Optional<List<NhaCungCapDTO>> listDTO = nhaCungCapService.getAll();
+            Pageable pageable = PageRequest.of(page, size);
+            Page<NhaCungCapDTO> pageResult =
+                    nhaCungCapService.getAllAndSearchWithPage(timKiemNhaCungCapDTO, pageable);
 
-            if (listDTO.isPresent() && !listDTO.get().isEmpty()) {
+            if (pageResult != null && pageResult.hasContent()) {
                 apiResponse.setSuccess(true);
                 apiResponse.setMessage("Lấy danh sách nhà cung cấp thành công!");
-                apiResponse.setData(listDTO.get());
-                return ResponseEntity.ok(apiResponse);
+                apiResponse.setData(pageResult);
+                return ResponseEntity.ok(apiResponse); // 200
             } else {
                 apiResponse.setSuccess(false);
-                apiResponse.setMessage("Không có nhà cung cấp nào!");
+                apiResponse.setMessage("Không có dữ liệu nhà cung cấp nào!");
                 apiResponse.setData(null);
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(apiResponse);
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(apiResponse); // 204
             }
+
         } catch (Exception e) {
             apiResponse.setSuccess(false);
             apiResponse.setMessage("Đã xảy ra lỗi: " + e.getMessage());
             apiResponse.setData(null);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse); // 500
         }
     }
 
@@ -76,30 +85,6 @@ public class NhaCungCapController {
         }
     }
 
-    // Tìm kiếm nhà cung cấp
-    @PostMapping("/search")
-    public ResponseEntity<ApiResponse> searchNhaCungCap(@RequestBody TimKiemNhaCungCapDTO timKiemDTO) {
-        try {
-            Optional<List<NhaCungCapDTO>> result = nhaCungCapService.search(timKiemDTO);
-
-            if (result.isPresent() && !result.get().isEmpty()) {
-                apiResponse.setSuccess(true);
-                apiResponse.setMessage("Tìm kiếm nhà cung cấp thành công!");
-                apiResponse.setData(result.get());
-                return ResponseEntity.ok(apiResponse);
-            } else {
-                apiResponse.setSuccess(false);
-                apiResponse.setMessage("Không tìm thấy nhà cung cấp phù hợp!");
-                apiResponse.setData(null);
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(apiResponse);
-            }
-        } catch (Exception e) {
-            apiResponse.setSuccess(false);
-            apiResponse.setMessage("Đã xảy ra lỗi: " + e.getMessage());
-            apiResponse.setData(null);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse);
-        }
-    }
 
     // Thêm nhà cung cấp mới
     @PostMapping
