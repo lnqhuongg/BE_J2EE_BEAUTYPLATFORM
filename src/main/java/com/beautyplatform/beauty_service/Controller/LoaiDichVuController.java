@@ -1,7 +1,7 @@
 package com.beautyplatform.beauty_service.Controller;
 
 import com.beautyplatform.beauty_service.DTO.LoaiDichVuDTO.LoaiDichVuDTO;
-import com.beautyplatform.beauty_service.DTO.LoaiDichVuDTO.LoaiDichVuFilterDTO;
+import com.beautyplatform.beauty_service.DTO.LoaiHinhKinhDoanhDTO.LoaiHinhKinhDoanhDTO;
 import com.beautyplatform.beauty_service.Helper.ApiResponse;
 import com.beautyplatform.beauty_service.Service.Interface.ILoaiDichVuService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,24 +25,41 @@ public class LoaiDichVuController {
     @Autowired
     private ApiResponse apiResponse;
 
+    // ✅ Lấy tất cả loại dịch vụ
     @GetMapping
-    public ResponseEntity<Page<LoaiDichVuDTO>> getAll(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return ResponseEntity.ok(loaiDichVuService.getAll(pageable));
+    public ResponseEntity<ApiResponse> getAllLoaiDichVu(@RequestParam(defaultValue = "0") int page,
+                                                        @RequestParam(defaultValue = "5") int size,
+                                                        @RequestParam(required = false) String keyword) {
+        try {
+            Pageable pageable = PageRequest.of(page, size);
+            Page<LoaiDichVuDTO> pageResult;
+
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                pageResult = loaiDichVuService.searchWithPage(keyword.trim(), pageable);
+            } else {
+                pageResult = loaiDichVuService.getAll(pageable);
+            }
+
+            if (pageResult != null && pageResult.hasContent()) {
+                apiResponse.setSuccess(true);
+                apiResponse.setMessage("Lấy danh sách loại dịch vụ thành công!");
+                apiResponse.setData(pageResult);
+                return ResponseEntity.ok(apiResponse);
+            } else {
+                apiResponse.setSuccess(false);
+                apiResponse.setMessage("Không có loại dịch vụ nào trong hệ thống!");
+                apiResponse.setData(null);
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(apiResponse);
+            }
+        } catch (Exception e) {
+            apiResponse.setSuccess(false);
+            apiResponse.setMessage("Lỗi khi lấy danh sách loại dịch vụ: " + e.getMessage());
+            apiResponse.setData(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse);
+        }
     }
 
-    // 2️⃣ Bộ lọc loại dịch vụ
-    @PostMapping("/filter")
-    public ResponseEntity<Page<LoaiDichVuDTO>> filter(
-            @RequestBody LoaiDichVuFilterDTO filter,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return ResponseEntity.ok(loaiDichVuService.filter(filter, pageable));
-    }
-
+    // ✅ Lấy loại dịch vụ theo mã
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse> getLoaiDichVuById(@PathVariable("id") int maLDV) {
         try {
@@ -67,6 +84,7 @@ public class LoaiDichVuController {
         }
     }
 
+    // ✅ Thêm mới loại dịch vụ
     @PostMapping
     public ResponseEntity<ApiResponse> addLoaiDichVu(@RequestBody LoaiDichVuDTO loaiDichVuDTO) {
         try {
@@ -91,6 +109,7 @@ public class LoaiDichVuController {
         }
     }
 
+    // ✅ Cập nhật loại dịch vụ
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse> updateLoaiDichVu(
             @PathVariable("id") int maLDV,
@@ -118,7 +137,8 @@ public class LoaiDichVuController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse);
         }
     }
-    
+
+    // ✅ Xóa (soft delete) loại dịch vụ
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse> deleteLoaiDichVu(@PathVariable("id") int maLDV) {
         try {

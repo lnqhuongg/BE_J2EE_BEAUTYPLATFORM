@@ -9,6 +9,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -20,29 +24,48 @@ public class KhachHangController {
 
     @Autowired
     private ApiResponse apiResponse;
-    //getall
+
+// Lấy tất cả khách hàng hoặc tìm kiếm bằng keyword
     @GetMapping
-    public ResponseEntity<ApiResponse> getAllKhachHang(){
-        try{
-            Optional<List<KhachHangDTO>> listKhachHangDTO = khachHangService.getAll();
-            if(listKhachHangDTO.isPresent() && !listKhachHangDTO.get().isEmpty()){
+    public ResponseEntity<ApiResponse> getAllKhachHang(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(required = false) String keyword) {
+
+        try {
+            Pageable pageable = PageRequest.of(page, size);
+            Page<KhachHangDTO> pageResult;
+
+            // nếu có keyword thì tìm kiếm
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                pageResult = khachHangService.searchWithPage(keyword.trim(), pageable);
+            }
+            // nếu không có keyword thì lấy tất cả
+            else {
+                pageResult = khachHangService.getAll(pageable);
+            }
+
+            // kiểm tra kết quả
+            if (pageResult != null && pageResult.hasContent()) {
                 apiResponse.setSuccess(true);
                 apiResponse.setMessage("Lấy danh sách khách hàng thành công!");
-                apiResponse.setData(listKhachHangDTO.get());
-                return ResponseEntity.ok(apiResponse); // HTTP 200
+                apiResponse.setData(pageResult);
+                return ResponseEntity.ok(apiResponse); // 200 OK
             } else {
                 apiResponse.setSuccess(false);
-                apiResponse.setMessage("Không có dữ liệu khách hàng nào!");
+                apiResponse.setMessage("Không có khách hàng nào!");
                 apiResponse.setData(null);
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(apiResponse); // HTTP 204
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(apiResponse); // 204
             }
-        }catch(Exception e){
+
+        } catch (Exception e) {
             apiResponse.setSuccess(false);
-            apiResponse.setMessage("Đã xảy ra lỗi: " + e.getMessage());
+            apiResponse.setMessage("Lỗi xảy ra khi lấy danh sách khách hàng: " + e.getMessage());
             apiResponse.setData(null);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse); // HTTP 500
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse); // 500
         }
     }
+
     //id
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse> getKhuyenMaiById(@PathVariable("id") int maKH) {
@@ -131,29 +154,5 @@ public class KhachHangController {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse);
             }
 
-    }
-    //tìm kiếm khách hàng
-    @PostMapping("/search")
-    public ResponseEntity<ApiResponse> searchKhachHang(@RequestBody TimKiemKhachHangDTO timKiemKhachHangDTO) {
-        try {
-            Optional<List<KhachHangDTO>> result = khachHangService.search(timKiemKhachHangDTO);
-
-            if (result.isPresent() && !result.get().isEmpty()) {
-                apiResponse.setSuccess(true);
-                apiResponse.setMessage("Tìm kiếm khách hàng thành công!");
-                apiResponse.setData(result.get());
-                return ResponseEntity.ok(apiResponse);
-            } else {
-                apiResponse.setSuccess(false);
-                apiResponse.setMessage("Không tìm thấy khách hàng phù hợp!");
-                apiResponse.setData(null);
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(apiResponse);
-            }
-        } catch (Exception e) {
-            apiResponse.setSuccess(false);
-            apiResponse.setMessage("Đã xảy ra lỗi: " + e.getMessage());
-            apiResponse.setData(null);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse);
-        }
     }
 }

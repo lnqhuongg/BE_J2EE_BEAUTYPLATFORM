@@ -1,12 +1,18 @@
 package com.beautyplatform.beauty_service.Controller;
 
+import com.beautyplatform.beauty_service.DTO.KhachHangDTO.KhachHangDTO;
 import com.beautyplatform.beauty_service.DTO.NhanVienDTO.NhanVienDTO;
+import com.beautyplatform.beauty_service.DTO.NhanVienDTO.TimKiemNhanVienDTO;
 import com.beautyplatform.beauty_service.Helper.ApiResponse;
 import com.beautyplatform.beauty_service.Service.Interface.INhanVienService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,16 +27,29 @@ public class NhanVienController {
     @Autowired
     private ApiResponse apiResponse;
 
-    // Lấy tất cả nhân viên
     @GetMapping
-    public ResponseEntity<ApiResponse> getAllNhanVien() {
+    public ResponseEntity<ApiResponse> getAllNhanVien(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(required = false) String keyword
+    ) {
         try {
-            Optional<List<NhanVienDTO>> listNhanVienDTO = nhanVienService.getAll();
+            Pageable pageable = PageRequest.of(page, size);
+            Page<NhanVienDTO> pageResult;
 
-            if (listNhanVienDTO.isPresent() && !listNhanVienDTO.get().isEmpty()) {
+            // nếu có keyword thì tìm kiếm
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                pageResult = nhanVienService.searchWithPage(keyword.trim(), pageable);
+            }
+            // nếu không có keyword thì lấy tất cả
+            else {
+                pageResult = nhanVienService.getAll(pageable);
+            }
+
+            if (pageResult != null && pageResult.hasContent()) {
                 apiResponse.setSuccess(true);
                 apiResponse.setMessage("Lấy danh sách nhân viên thành công!");
-                apiResponse.setData(listNhanVienDTO.get());
+                apiResponse.setData(pageResult);
                 return ResponseEntity.ok(apiResponse); // 200
             } else {
                 apiResponse.setSuccess(false);
@@ -38,6 +57,7 @@ public class NhanVienController {
                 apiResponse.setData(null);
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).body(apiResponse); // 204
             }
+
         } catch (Exception e) {
             apiResponse.setSuccess(false);
             apiResponse.setMessage("Đã xảy ra lỗi: " + e.getMessage());

@@ -1,7 +1,6 @@
 package com.beautyplatform.beauty_service.Service.Interface;
 
 import com.beautyplatform.beauty_service.DTO.LoaiDichVuDTO.LoaiDichVuDTO;
-import com.beautyplatform.beauty_service.DTO.LoaiDichVuDTO.LoaiDichVuFilterDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -22,9 +21,9 @@ public interface ILoaiDichVuService {
     // Lấy toàn bộ danh sách loại dịch vụ
     Page<LoaiDichVuDTO> getAll(Pageable pageable);
 
+    // tìm kiếm + phân trang cho loại dịch vụ
+    Page<LoaiDichVuDTO> searchWithPage(String keyword, Pageable pageable);
+
     // Lấy loại dịch vụ theo mã
     Optional<LoaiDichVuDTO> getById(int maLDV);
-
-    // Tìm kiếm loại dịch vụ theo tên hoặc trạng thái
-    Page<LoaiDichVuDTO> filter(LoaiDichVuFilterDTO filter, Pageable pageable);
 }

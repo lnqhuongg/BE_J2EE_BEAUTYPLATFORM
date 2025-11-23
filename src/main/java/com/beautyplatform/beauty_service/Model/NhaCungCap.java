@@ -16,7 +16,7 @@ public class NhaCungCap {
     @Column(name = "maNCC")
     private int maNCC;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "maTK", nullable = false)
     private TaiKhoan taiKhoan;
 

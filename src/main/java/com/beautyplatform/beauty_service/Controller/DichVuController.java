@@ -1,7 +1,8 @@
 package com.beautyplatform.beauty_service.Controller;
 
 import com.beautyplatform.beauty_service.DTO.DichVuDTO.DichVuDTO;
-import com.beautyplatform.beauty_service.DTO.DichVuDTO.DichVuFilterDTO;
+import com.beautyplatform.beauty_service.DTO.DichVuDTO.DichVuResponseDTO;
+import com.beautyplatform.beauty_service.DTO.DichVuDTO.TimKiemDichVuDTO;
 import com.beautyplatform.beauty_service.Helper.ApiResponse;
 import com.beautyplatform.beauty_service.Service.Interface.IDichVuService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Optional;
 
 
@@ -25,35 +25,46 @@ public class DichVuController {
     @Autowired
     private ApiResponse apiResponse;
 
+    // lấy tất cả, danh sách dịch vụ
+    // @ModelAttribute hỗ trợ tìm kiếm (query bằng đường dẫn VD: /dichvu?page=0&size=5&maDV=1&tenDV=“Cắt tóc”&maLDV=2)
     @GetMapping
-    public ResponseEntity<Page<DichVuDTO>> getAll(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<DichVuDTO> result = dichVuService.getAll(pageable);
-        return ResponseEntity.ok(result);
-    }
+    public ResponseEntity<ApiResponse> getAllDichVu(@RequestParam(defaultValue = "0") int page,
+                                                    @RequestParam(defaultValue = "5") int size,
+                                                    @ModelAttribute TimKiemDichVuDTO timKiemDichVuDTO) {
+        try {
+            Pageable pageable = PageRequest.of(page, size);
+            Page<DichVuResponseDTO> pageResult = dichVuService.getAllAndSearchWithPage(timKiemDichVuDTO, pageable);
 
-    @PostMapping("/filter")
-    public ResponseEntity<Page<DichVuDTO>> filter(
-            @RequestBody DichVuFilterDTO filter,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<DichVuDTO> result = dichVuService.filter(filter, pageable);
-        return ResponseEntity.ok(result);
+            // Nếu Optional có dữ liệu và danh sách không rỗng
+            if (pageResult != null && pageResult.hasContent()) {
+                apiResponse.setSuccess(true);
+                apiResponse.setMessage("Lấy danh sách dịch vụ thành công!");
+                apiResponse.setData(pageResult);
+                return ResponseEntity.ok(apiResponse); // HTTP 200
+            } else {
+                apiResponse.setSuccess(false);
+                apiResponse.setMessage("Không có dữ liệu dịch vụ nào!");
+                apiResponse.setData(null);
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(apiResponse); // HTTP 204
+            }
+        } catch (Exception e) {
+            apiResponse.setSuccess(false);
+            apiResponse.setMessage("Đã xảy ra lỗi: " + e.getMessage());
+            apiResponse.setData(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse); // HTTP 500
+        }
     }
 
     // lấy theo id (sử dụng cho sửa hoặc xem chi tiết)
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse> getDichVuById(@PathVariable("id") int maDV) {
         try {
-            Optional<DichVuDTO> dichVuDTO = dichVuService.getByDichVuId(maDV);
+            Optional<DichVuResponseDTO> DichVuResponseDTO = dichVuService.getByDichVuId(maDV);
             // isPresent() để kiểm tra xem Optional trên có giá trị hay không
-            if (dichVuDTO.isPresent()) {
+            if (DichVuResponseDTO.isPresent()) {
                 apiResponse.setSuccess(true);
                 apiResponse.setMessage("Lấy danh sách dịch vụ thành công!");
-                apiResponse.setData(dichVuDTO);
+                apiResponse.setData(DichVuResponseDTO);
                 return ResponseEntity.ok(apiResponse); // HTTP 200
             } else {
                 apiResponse.setSuccess(false);
@@ -73,7 +84,7 @@ public class DichVuController {
     @PostMapping
     public ResponseEntity<ApiResponse> addDichVu(@RequestBody DichVuDTO dichVuDTO) {
         try {
-            Optional<DichVuDTO> addDTO = dichVuService.add(dichVuDTO);
+            Optional<DichVuResponseDTO> addDTO = dichVuService.add(dichVuDTO);
 
             if (addDTO.isEmpty()) {
                 apiResponse.setSuccess(false);
@@ -96,13 +107,13 @@ public class DichVuController {
     }
 
     // sửa
-    @PutMapping("/{maKM}")
+    @PutMapping("/{maDV}")
     public ResponseEntity<ApiResponse> updateDichVu (@PathVariable("maDV") int maDV, @RequestBody DichVuDTO dichVuDTO) {
         try {
             // lúc submit chỉnh sửa, thì phải gửi cả id của đối tượng đó thì entity mới hiểu được là đang sửa ở đối tượng nào trong bảng
             dichVuDTO.setMaDV(maDV);
 
-            Optional<DichVuDTO> updatedDTO = dichVuService.update(dichVuDTO);
+            Optional<DichVuResponseDTO> updatedDTO = dichVuService.update(dichVuDTO);
 
             if (updatedDTO.isEmpty()) {
                 apiResponse.setSuccess(false);

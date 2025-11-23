@@ -1,8 +1,11 @@
 package com.beautyplatform.beauty_service.Service.Impl;
 
+import com.beautyplatform.beauty_service.DTO.KhachHangDTO.KhachHangDTO;
 import com.beautyplatform.beauty_service.DTO.NhanVienDTO.NhanVienDTO;
 import com.beautyplatform.beauty_service.DTO.NhanVienDTO.TimKiemNhanVienDTO;
+import com.beautyplatform.beauty_service.Mapper.KhachHangMapper;
 import com.beautyplatform.beauty_service.Mapper.NhanVienMapper;
+import com.beautyplatform.beauty_service.Model.KhachHang;
 import com.beautyplatform.beauty_service.Model.NhaCungCap;
 import com.beautyplatform.beauty_service.Model.NhanVien;
 import com.beautyplatform.beauty_service.Repository.NhaCungCapRepository;
@@ -11,6 +14,9 @@ import com.beautyplatform.beauty_service.Service.Interface.INhanVienService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,18 +30,25 @@ public class NhanVienService implements INhanVienService {
     @Autowired
     private NhaCungCapRepository nhaCungCapRepository;
 
-    // Lấy tất cả
     @Override
-    public Optional<List<NhanVienDTO>> getAll() {
+    public Page<NhanVienDTO> getAll(Pageable pageable) {
         try {
-            List<NhanVien> listNVEntity = repository.findAll();
-            List<NhanVienDTO> dtoList = listNVEntity.stream()
-                    .map(NhanVienMapper::toDTO)
-                    .toList();
-            return Optional.of(dtoList);
+            Page<NhanVien> pageEntity = repository.findAll(pageable);
+            return pageEntity.map(NhanVienMapper::toDTO);
         } catch (Exception e) {
-            System.err.println("Lỗi khi lấy danh sách nhân viên: " + e.getMessage());
-            return Optional.empty();
+            System.err.println("Lỗi khi lấy danh sách khách hàng: " + e.getMessage());
+            return Page.empty(pageable);
+        }
+    }
+
+    @Override
+    public Page<NhanVienDTO> searchWithPage(String keyword, Pageable pageable) {
+        try {
+            Page<NhanVien> pageEntity = repository.searchWithPage(keyword, pageable);
+            return pageEntity.map(NhanVienMapper::toDTO);
+        } catch (Exception e) {
+            System.err.println("Lỗi khi tìm kiếm khách hàng có phân trang: " + e.getMessage());
+            return Page.empty(pageable);
         }
     }
 
@@ -52,28 +65,6 @@ public class NhanVienService implements INhanVienService {
         }
     }
 
-    // Tìm kiếm và lọc
-    @Override
-    public Optional<List<NhanVienDTO>> search(TimKiemNhanVienDTO timKiemDTO) {
-        try {
-            List<NhanVien> listNVEntity = repository.search(
-                    timKiemDTO.getMaNV(),
-                    timKiemDTO.getMaNCC(),
-                    timKiemDTO.getHoTen(),
-                    timKiemDTO.getGioiTinh(),
-                    timKiemDTO.getTrangThai()
-            );
-
-            List<NhanVienDTO> dtoList = listNVEntity.stream()
-                    .map(NhanVienMapper::toDTO)
-                    .toList();
-
-            return Optional.of(dtoList);
-        } catch (Exception e) {
-            System.err.println("Lỗi khi tìm kiếm nhân viên: " + e.getMessage());
-            return Optional.empty();
-        }
-    }
 
     // Thêm nhân viên mới
     @Override

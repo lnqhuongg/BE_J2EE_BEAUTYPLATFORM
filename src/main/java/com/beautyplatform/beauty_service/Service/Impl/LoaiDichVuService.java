@@ -1,9 +1,11 @@
 package com.beautyplatform.beauty_service.Service.Impl;
 
 import com.beautyplatform.beauty_service.DTO.LoaiDichVuDTO.LoaiDichVuDTO;
-import com.beautyplatform.beauty_service.DTO.LoaiDichVuDTO.LoaiDichVuFilterDTO;
+import com.beautyplatform.beauty_service.DTO.LoaiHinhKinhDoanhDTO.LoaiHinhKinhDoanhDTO;
 import com.beautyplatform.beauty_service.Mapper.LoaiDichVuMapper;
+import com.beautyplatform.beauty_service.Mapper.LoaiHinhKinhDoanhMapper;
 import com.beautyplatform.beauty_service.Model.LoaiDichVu;
+import com.beautyplatform.beauty_service.Model.LoaiHinhKinhDoanh;
 import com.beautyplatform.beauty_service.Repository.LoaiDichVuRepository;
 import com.beautyplatform.beauty_service.Service.Interface.ILoaiDichVuService;
 import jakarta.persistence.EntityNotFoundException;
@@ -21,6 +23,7 @@ public class LoaiDichVuService implements ILoaiDichVuService {
     @Autowired
     private LoaiDichVuRepository repository;
 
+    // ✅ Lấy toàn bộ loại dịch vụ
     @Override
     public Page<LoaiDichVuDTO> getAll(Pageable pageable) {
         try {
@@ -33,20 +36,17 @@ public class LoaiDichVuService implements ILoaiDichVuService {
     }
 
     @Override
-    public Page<LoaiDichVuDTO> filter(LoaiDichVuFilterDTO filter, Pageable pageable) {
+    public Page<LoaiDichVuDTO> searchWithPage(String keyword, Pageable pageable) {
         try {
-            Page<LoaiDichVu> pageEntity = repository.filterLoaiDichVu(
-                    filter.getTenLDV(),
-                    filter.getTrangThai(),
-                    pageable
-            );
+            Page<LoaiDichVu> pageEntity = repository.searchWithPage(keyword, pageable);
             return pageEntity.map(LoaiDichVuMapper::toDTO);
         } catch (Exception e) {
-            System.err.println("Lỗi khi lọc loại dịch vụ: " + e.getMessage());
+            System.err.println("Lỗi khi tìm kiếm có phân trang: " + e.getMessage());
             return Page.empty(pageable);
         }
     }
 
+    // ✅ Lấy loại dịch vụ theo mã
     @Override
     public Optional<LoaiDichVuDTO> getById(int maLDV) {
         try {
@@ -59,6 +59,7 @@ public class LoaiDichVuService implements ILoaiDichVuService {
         }
     }
 
+    // ✅ Thêm mới loại dịch vụ
     @Override
     public Optional<LoaiDichVuDTO> add(LoaiDichVuDTO dto) {
         try {
@@ -72,6 +73,7 @@ public class LoaiDichVuService implements ILoaiDichVuService {
         }
     }
 
+    // ✅ Cập nhật loại dịch vụ
     @Override
     public Optional<LoaiDichVuDTO> update(LoaiDichVuDTO dto) {
         try {
@@ -89,6 +91,7 @@ public class LoaiDichVuService implements ILoaiDichVuService {
         }
     }
 
+    // ✅ Xóa (soft delete)
     @Override
     public Optional<LoaiDichVuDTO> delete(LoaiDichVuDTO dto) {
         try {

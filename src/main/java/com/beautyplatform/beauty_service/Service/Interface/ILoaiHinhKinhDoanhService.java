@@ -5,7 +5,6 @@ import com.beautyplatform.beauty_service.DTO.LoaiHinhKinhDoanhDTO.LoaiHinhKinhDo
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface ILoaiHinhKinhDoanhService {
@@ -25,7 +24,7 @@ public interface ILoaiHinhKinhDoanhService {
     // Lấy loại dịch vụ theo mã
     Optional<LoaiHinhKinhDoanhDTO> getById(int maLH);
 
-    public boolean isNameExist (String tenLH);
+    boolean isNameExist (String tenLH);
 
-    public boolean isNameExistUpdate(String tenLH, int maLH);
+    boolean isNameExistUpdate(String tenLH, int maLH);
 }

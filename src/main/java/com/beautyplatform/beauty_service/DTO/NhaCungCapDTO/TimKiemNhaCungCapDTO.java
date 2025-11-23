@@ -9,8 +9,8 @@ import lombok.*;
 @Builder
 public class TimKiemNhaCungCapDTO {
     private Integer maNCC;
-    private Integer maTK;
     private Integer maLH;
     private String tenNCC;
     private String diaChi;
+    private String email;
 }

@@ -21,7 +21,7 @@ public class KhachHang {
     @Column(name = "maKH")
     private int maKH;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "maTK", nullable = false)
     private TaiKhoan taiKhoan;
 

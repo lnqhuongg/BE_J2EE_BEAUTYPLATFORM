@@ -13,6 +13,8 @@ import com.beautyplatform.beauty_service.Service.Interface.INhaCungCapService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -38,16 +40,23 @@ public class NhaCungCapService implements INhaCungCapService {
     // ==================== CRUD NHÀ CUNG CẤP ====================
 
     @Override
-    public Optional<List<NhaCungCapDTO>> getAll() {
+    public Page<NhaCungCapDTO> getAllAndSearchWithPage(TimKiemNhaCungCapDTO timKiemNhaCungCapDTO,
+                                                       Pageable pageable) {
         try {
-            List<NhaCungCap> entities = repository.findAll();
-            List<NhaCungCapDTO> dtoList = entities.stream()
-                    .map(NhaCungCapMapper::toDTO)
-                    .toList();
-            return Optional.of(dtoList);
+            Page<NhaCungCap> pageEntity = repository.searchWithPage(
+                    timKiemNhaCungCapDTO.getMaNCC(),
+                    timKiemNhaCungCapDTO.getMaLH(),
+                    timKiemNhaCungCapDTO.getTenNCC(),
+                    timKiemNhaCungCapDTO.getDiaChi(),
+                    timKiemNhaCungCapDTO.getEmail(),
+                    pageable
+            );
+
+            return pageEntity.map(NhaCungCapMapper::toDTO);
+
         } catch (Exception e) {
-            System.err.println("Lỗi khi lấy danh sách nhà cung cấp: " + e.getMessage());
-            return Optional.empty();
+            System.err.println("Lỗi khi tìm kiếm nhà cung cấp có phân trang: " + e.getMessage());
+            return Page.empty(pageable);
         }
     }
 
@@ -59,28 +68,6 @@ public class NhaCungCapService implements INhaCungCapService {
             return Optional.of(NhaCungCapMapper.toDTO(entity));
         } catch (Exception e) {
             System.err.println("Lỗi khi tìm nhà cung cấp: " + e.getMessage());
-            return Optional.empty();
-        }
-    }
-
-    @Override
-    public Optional<List<NhaCungCapDTO>> search(TimKiemNhaCungCapDTO timKiemDTO) {
-        try {
-            List<NhaCungCap> entities = repository.search(
-                    timKiemDTO.getMaNCC(),
-                    timKiemDTO.getMaTK(),
-                    timKiemDTO.getMaLH(),
-                    timKiemDTO.getTenNCC(),
-                    timKiemDTO.getDiaChi()
-            );
-
-            List<NhaCungCapDTO> dtoList = entities.stream()
-                    .map(NhaCungCapMapper::toDTO)
-                    .toList();
-
-            return Optional.of(dtoList);
-        } catch (Exception e) {
-            System.err.println("Lỗi khi tìm kiếm nhà cung cấp: " + e.getMessage());
             return Optional.empty();
         }
     }

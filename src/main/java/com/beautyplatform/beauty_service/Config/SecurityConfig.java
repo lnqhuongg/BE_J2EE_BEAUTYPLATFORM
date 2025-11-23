@@ -32,9 +32,9 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // Public endpoints
-                        .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/oauth2/**").permitAll()
-                        .requestMatchers("/login/**").permitAll()
+//                        .requestMatchers("/auth/**").permitAll()
+//                        .requestMatchers("/oauth2/**").permitAll()
+//                        .requestMatchers("/login/**").permitAll()
                         // API công khai
                         .requestMatchers("/dichvu/**").permitAll()
                         .requestMatchers("/loaidichvu/**").permitAll()
@@ -44,13 +44,14 @@ public class SecurityConfig {
                         .requestMatchers("/khuyenmai/**").permitAll()
                         .requestMatchers("/khachhang/**").permitAll()
                         // Các endpoint khác cần authentication
-                        .anyRequest().authenticated()
-                )
-                .oauth2Login(oauth2 -> oauth2
-                        .loginPage("/auth/login")
-                        .defaultSuccessUrl("/auth/oauth2/success", true)
-                        .failureUrl("/auth/oauth2/failure")
+//                        .anyRequest().authenticated()
+                                .anyRequest().permitAll()
                 );
+//                .oauth2Login(oauth2 -> oauth2
+//                        .loginPage("/auth/login")
+//                        .defaultSuccessUrl("/auth/oauth2/success", true)
+//                        .failureUrl("/auth/oauth2/failure")
+//                );
 
         return http.build();
     }
