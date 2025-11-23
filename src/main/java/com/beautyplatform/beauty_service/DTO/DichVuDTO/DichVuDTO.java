@@ -10,10 +10,10 @@ import java.math.BigDecimal;
 @Setter
 
 public class DichVuDTO {
-    private int maDV;
-    // dto truyền vào chỉ nhận id của loại dich vụ với ncc thôi ko cần cả object
+    private Integer maDV;
     private int maLDV;
     private int maNCC;
+    private Integer maKM;
     private String tenDV;
     private String moTa;
     private BigDecimal gia;

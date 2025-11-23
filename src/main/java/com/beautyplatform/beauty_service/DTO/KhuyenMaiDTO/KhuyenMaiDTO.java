@@ -16,9 +16,7 @@ public class KhuyenMaiDTO {
     private int maNCC;
     private String moTa;
     private BigDecimal phanTram;
-//    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate ngayBatDau;
-//    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate ngayKetThuc;
     private int trangThai;
 }

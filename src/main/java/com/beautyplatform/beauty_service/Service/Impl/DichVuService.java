@@ -1,13 +1,15 @@
 package com.beautyplatform.beauty_service.Service.Impl;
 
 import com.beautyplatform.beauty_service.DTO.DichVuDTO.DichVuDTO;
+import com.beautyplatform.beauty_service.DTO.DichVuDTO.DichVuResponseDTO;
 import com.beautyplatform.beauty_service.DTO.DichVuDTO.TimKiemDichVuDTO;
 import com.beautyplatform.beauty_service.Mapper.DichVuMapper;
-import com.beautyplatform.beauty_service.Mapper.LoaiDichVuMapper;
 import com.beautyplatform.beauty_service.Model.DichVu;
+import com.beautyplatform.beauty_service.Model.KhuyenMai;
 import com.beautyplatform.beauty_service.Model.LoaiDichVu;
 import com.beautyplatform.beauty_service.Model.NhaCungCap;
 import com.beautyplatform.beauty_service.Repository.DichVuRepository;
+import com.beautyplatform.beauty_service.Repository.KhuyenMaiRepository;
 import com.beautyplatform.beauty_service.Repository.LoaiDichVuRepository;
 import com.beautyplatform.beauty_service.Repository.NhaCungCapRepository;
 import com.beautyplatform.beauty_service.Service.Interface.IDichVuService;
@@ -17,8 +19,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -33,12 +33,15 @@ public class DichVuService implements IDichVuService {
     @Autowired
     private NhaCungCapRepository nhaCungCapRepository;
 
+    @Autowired
+    private KhuyenMaiRepository khuyenMaiRepository;
+
     // lấy tất cả (hiển thị trên danh sách)
     // tránh xử dụng <List<DichVuDTO> (không có Optional) vì có thể trả về null, trường hợp truyền dữ liệu sai có thể bị lỗi tùm lum
     // nói chung là thống nhất trả về Optional (1 kiểu thôi) cho gọn với code nhanh hơn
     // lấy tất cả nếu ko có lọc, còn nếu có lọc thì lọc nhưng mà cuối cùng thì vẫn có phân trang
     @Override
-    public Page<DichVuDTO> getAllAndSearchWithPage(TimKiemDichVuDTO timKiemDichVuDTO, Pageable pageable) {
+    public Page<DichVuResponseDTO> getAllAndSearchWithPage(TimKiemDichVuDTO timKiemDichVuDTO, Pageable pageable) {
         try {
             Page<DichVu> pageEntity = repository.searchWithPage(
                     timKiemDichVuDTO.getMaDV(),
@@ -56,7 +59,7 @@ public class DichVuService implements IDichVuService {
 
     // lấy theo id (dùng khi nhấn vào modal chỉnh sửa trên giao diện)
     @Override
-    public Optional<DichVuDTO> getByDichVuId(int maDV){
+    public Optional<DichVuResponseDTO> getByDichVuId(int maDV){
         try {
             // lấy danh sách entity từ database
             DichVu dichVu = repository.findById(maDV)
@@ -74,14 +77,19 @@ public class DichVuService implements IDichVuService {
 
     // thêm
     @Override
-    public Optional<DichVuDTO> add(DichVuDTO dichVuDTO) {
+    public Optional<DichVuResponseDTO> add(DichVuDTO dichVuDTO) {
         // nhận DTO từ controller -> map từ DTO sang Entity để lưu vào database
         LoaiDichVu loaiDichVu = loaiDichVuRepository.findById(dichVuDTO.getMaLDV())
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy loại dịch vụ"));
         NhaCungCap nhaCungCap = nhaCungCapRepository.findById(dichVuDTO.getMaNCC())
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy nhà cung cấp"));
+        KhuyenMai khuyenMai = null;
+        if (dichVuDTO.getMaKM() != null) {
+            khuyenMai = khuyenMaiRepository.findById(dichVuDTO.getMaKM())
+                    .orElse(null); // Không lỗi nếu không tìm thấy
+        }
 
-        DichVu dv = DichVuMapper.toEntity(dichVuDTO, loaiDichVu, nhaCungCap);
+        DichVu dv = DichVuMapper.toEntity(dichVuDTO, loaiDichVu, nhaCungCap, khuyenMai);
         // cái nào có trạng thái thì mới tạo trạng thái luôn hoạt động nha, tạm thời cứ để vậy đi nha, tui xem r gửi mng cái
         // mô tả website chính thức nha
         dv.setTrangThai(1);
@@ -93,7 +101,7 @@ public class DichVuService implements IDichVuService {
 
     // sửa
     @Override
-    public Optional<DichVuDTO> update(DichVuDTO dichVuDTO){
+    public Optional<DichVuResponseDTO> update(DichVuDTO dichVuDTO){
 
         DichVu existing = repository.findById(dichVuDTO.getMaDV())
                 .orElse(null);
@@ -106,6 +114,16 @@ public class DichVuService implements IDichVuService {
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy loại dịch vụ"));
         NhaCungCap nhaCungCap = nhaCungCapRepository.findById(dichVuDTO.getMaNCC())
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy nhà cung cấp"));
+
+        if (dichVuDTO.getMaKM() == null) {
+            // FE muốn bỏ khuyến mãi
+            existing.setKhuyenMai(null);
+        } else {
+            // FE muốn set khuyến mãi mới
+            KhuyenMai km = khuyenMaiRepository.findById(dichVuDTO.getMaKM())
+                    .orElse(null);
+            existing.setKhuyenMai(km);
+        }
 
         // làm như thế này, ko sử dụng mapper như thêm được vì có thể mình chỉ sửa 1 số trường thôi không sửa tất cả, tránh
         // việc nếu không sửa các trường khác thì nó ko gửi cái giá trị null đến dto
@@ -124,8 +142,8 @@ public class DichVuService implements IDichVuService {
     }
 
     // xóa -- đang xem xét có nên cho xóa hay không
-    @Override
-    public Optional<DichVuDTO> delete(DichVuDTO dichVuDTO){
-        return Optional.of(dichVuDTO);
-    }
+//    @Override
+//    public Optional<DichVuResponseDTO> delete(DichVuDTO dichVuDTO){
+//        return Optional.of(dichVuDTO);
+//    }
 }

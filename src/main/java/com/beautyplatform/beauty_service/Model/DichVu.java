@@ -29,7 +29,7 @@ public class DichVu {
     private NhaCungCap nhaCungCap;
 
     @ManyToOne
-    @JoinColumn(name = "maKM", nullable = true)
+    @JoinColumn(name = "maKM")
     private KhuyenMai khuyenMai;
 
     @Column(name = "tenDV", nullable = false)
