@@ -1,9 +1,6 @@
 package com.beautyplatform.beauty_service.Controller;
 
-import com.beautyplatform.beauty_service.DTO.NhaCungCapDTO.NhaCungCapDTO;
-import com.beautyplatform.beauty_service.DTO.NhaCungCapDTO.NhaCungCapGioLamViecDTO;
-import com.beautyplatform.beauty_service.DTO.NhaCungCapDTO.NhaCungCapHinhAnhDTO;
-import com.beautyplatform.beauty_service.DTO.NhaCungCapDTO.TimKiemNhaCungCapDTO;
+import com.beautyplatform.beauty_service.DTO.NhaCungCapDTO.*;
 import com.beautyplatform.beauty_service.Helper.ApiResponse;
 import com.beautyplatform.beauty_service.Service.Interface.INhaCungCapService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,34 +34,36 @@ public class NhaCungCapController {
     ) {
         try {
             Pageable pageable = PageRequest.of(page, size);
-            Page<NhaCungCapDTO> pageResult =
+
+            // ✅ Trả về Page<NhaCungCapResponseDTO>
+            Page<NhaCungCapResponseDTO> pageResult =
                     nhaCungCapService.getAllAndSearchWithPage(timKiemNhaCungCapDTO, pageable);
 
             if (pageResult != null && pageResult.hasContent()) {
                 apiResponse.setSuccess(true);
                 apiResponse.setMessage("Lấy danh sách nhà cung cấp thành công!");
                 apiResponse.setData(pageResult);
-                return ResponseEntity.ok(apiResponse); // 200
+                return ResponseEntity.ok(apiResponse);
             } else {
                 apiResponse.setSuccess(false);
                 apiResponse.setMessage("Không có dữ liệu nhà cung cấp nào!");
                 apiResponse.setData(null);
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(apiResponse); // 204
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(apiResponse);
             }
 
         } catch (Exception e) {
             apiResponse.setSuccess(false);
             apiResponse.setMessage("Đã xảy ra lỗi: " + e.getMessage());
             apiResponse.setData(null);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse); // 500
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse);
         }
     }
 
-    // Lấy nhà cung cấp theo ID
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse> getNhaCungCapById(@PathVariable("id") int maNCC) {
         try {
-            Optional<NhaCungCapDTO> dto = nhaCungCapService.getById(maNCC);
+            // ✅ Trả về NhaCungCapResponseDTO
+            Optional<NhaCungCapResponseDTO> dto = nhaCungCapService.getById(maNCC);
 
             if (dto.isPresent()) {
                 apiResponse.setSuccess(true);

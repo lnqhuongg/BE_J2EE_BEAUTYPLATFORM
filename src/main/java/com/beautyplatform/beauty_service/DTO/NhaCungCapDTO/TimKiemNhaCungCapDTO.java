@@ -12,5 +12,5 @@ public class TimKiemNhaCungCapDTO {
     private Integer maLH;
     private String tenNCC;
     private String diaChi;
-    private String email;
+    private Integer maTK;
 }

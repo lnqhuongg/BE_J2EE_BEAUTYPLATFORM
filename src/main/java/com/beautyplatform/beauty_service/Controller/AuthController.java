@@ -3,6 +3,8 @@ package com.beautyplatform.beauty_service.Controller;
 import com.beautyplatform.beauty_service.Config.JwtUtil;
 import com.beautyplatform.beauty_service.DTO.AuthDTO.*;
 import com.beautyplatform.beauty_service.Helper.ApiResponse;
+import com.beautyplatform.beauty_service.Model.TaiKhoan;
+import com.beautyplatform.beauty_service.Repository.TaiKhoanRepository;
 import com.beautyplatform.beauty_service.Service.Interface.IAuthService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,9 @@ public class AuthController {
 
     @Autowired
     private JwtUtil jwtUtil;
+
+    @Autowired
+    private TaiKhoanRepository taiKhoanRepository;
 
     // ==================== ĐĂNG KÝ QUA FORM ====================
 
@@ -198,6 +203,24 @@ public class AuthController {
             apiResponse.setSuccess(true);
             apiResponse.setMessage(result.get());
             apiResponse.setData(null);
+            return ResponseEntity.ok(apiResponse);
+
+        } catch (Exception e) {
+            apiResponse.setSuccess(false);
+            apiResponse.setMessage("Đã xảy ra lỗi: " + e.getMessage());
+            apiResponse.setData(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse);
+        }
+    }
+
+    @GetMapping("/check-email")
+    public ResponseEntity<ApiResponse> checkEmail(@RequestParam String email) {
+        try {
+            Optional<TaiKhoan> taiKhoan = taiKhoanRepository.findByEmail(email);
+
+            apiResponse.setSuccess(true);
+            apiResponse.setMessage("Kiểm tra email thành công");
+            apiResponse.setData(Map.of("exists", taiKhoan.isPresent()));
             return ResponseEntity.ok(apiResponse);
 
         } catch (Exception e) {
