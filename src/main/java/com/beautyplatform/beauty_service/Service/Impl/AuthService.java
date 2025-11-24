@@ -84,15 +84,11 @@ public class AuthService implements IAuthService {
 
             } else {
                 // Tạo Khách Hàng
-                LocalDate ngaySinh = dto.getNgaySinh() != null
-                        ? LocalDate.parse(dto.getNgaySinh(), DateTimeFormatter.ISO_DATE)
-                        : LocalDate.now();
-
                 KhachHang kh = KhachHang.builder()
                         .taiKhoan(savedTK)
                         .hoTen(dto.getHoTen())
-                        .gioiTinh(dto.getGioiTinh() != null ? dto.getGioiTinh() : 1)
-                        .ngaySinh(LocalDate.now())
+                        .gioiTinh(dto.getGioiTinh())
+                        .ngaySinh(dto.getNgaySinh())
                         .sdt(dto.getSdt() != null ? dto.getSdt() : "")
                         .hinhAnh("")
                         .build();
