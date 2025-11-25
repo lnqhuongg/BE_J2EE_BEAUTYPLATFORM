@@ -2,6 +2,7 @@ package com.beautyplatform.beauty_service.Controller;
 
 import com.beautyplatform.beauty_service.Config.JwtUtil;
 import com.beautyplatform.beauty_service.DTO.AuthDTO.*;
+import com.beautyplatform.beauty_service.DTO.KhachHangDTO.KhachHangDTO;
 import com.beautyplatform.beauty_service.Helper.ApiResponse;
 import com.beautyplatform.beauty_service.Model.TaiKhoan;
 import com.beautyplatform.beauty_service.Repository.TaiKhoanRepository;
@@ -29,9 +30,6 @@ public class AuthController {
 
     @Autowired
     private JwtUtil jwtUtil;
-
-    @Autowired
-    private TaiKhoanRepository taiKhoanRepository;
 
     // ==================== ĐĂNG KÝ QUA FORM ====================
 
@@ -85,61 +83,6 @@ public class AuthController {
             apiResponse.setData(null);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse);
         }
-    }
-
-    // ==================== OAUTH2 - GOOGLE ====================
-
-    @GetMapping("/oauth2/success")
-    public ResponseEntity<ApiResponse> oauth2Success(@AuthenticationPrincipal OAuth2User oauth2User) {
-        try {
-            if (oauth2User == null) {
-                apiResponse.setSuccess(false);
-                apiResponse.setMessage("Không thể lấy thông tin OAuth2!");
-                apiResponse.setData(null);
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(apiResponse);
-            }
-
-            // Lấy thông tin từ OAuth2User
-            String email = oauth2User.getAttribute("email");
-            String provider = "google"; // hoặc "facebook" tùy provider
-            String providerId = oauth2User.getAttribute("sub"); // Google ID
-
-            if (email == null) {
-                apiResponse.setSuccess(false);
-                apiResponse.setMessage("Không thể lấy email từ " + provider);
-                apiResponse.setData(null);
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiResponse);
-            }
-
-            // Đăng nhập/đăng ký qua OAuth2
-            Optional<AuthResponseDTO> result = authService.oauth2Login(email, provider, providerId);
-
-            if (result.isEmpty()) {
-                apiResponse.setSuccess(false);
-                apiResponse.setMessage("Đăng nhập qua " + provider + " không thành công!");
-                apiResponse.setData(null);
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiResponse);
-            }
-
-            apiResponse.setSuccess(true);
-            apiResponse.setMessage("Đăng nhập qua " + provider + " thành công!");
-            apiResponse.setData(result.get());
-            return ResponseEntity.ok(apiResponse);
-
-        } catch (Exception e) {
-            apiResponse.setSuccess(false);
-            apiResponse.setMessage("Đã xảy ra lỗi OAuth2: " + e.getMessage());
-            apiResponse.setData(null);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse);
-        }
-    }
-
-    @GetMapping("/oauth2/failure")
-    public ResponseEntity<ApiResponse> oauth2Failure() {
-        apiResponse.setSuccess(false);
-        apiResponse.setMessage("Đăng nhập OAuth2 thất bại!");
-        apiResponse.setData(null);
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(apiResponse);
     }
 
     // ==================== QUÊN MẬT KHẨU ====================
@@ -213,24 +156,6 @@ public class AuthController {
         }
     }
 
-    @GetMapping("/check-email")
-    public ResponseEntity<ApiResponse> checkEmail(@RequestParam String email) {
-        try {
-            Optional<TaiKhoan> taiKhoan = taiKhoanRepository.findByEmail(email);
-
-            apiResponse.setSuccess(true);
-            apiResponse.setMessage("Kiểm tra email thành công");
-            apiResponse.setData(Map.of("exists", taiKhoan.isPresent()));
-            return ResponseEntity.ok(apiResponse);
-
-        } catch (Exception e) {
-            apiResponse.setSuccess(false);
-            apiResponse.setMessage("Đã xảy ra lỗi: " + e.getMessage());
-            apiResponse.setData(null);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse);
-        }
-    }
-
     // ==================== VALIDATE TOKEN ====================
 
     @PostMapping("/validate")
@@ -289,8 +214,8 @@ public class AuthController {
 
     // ==================== LẤY THÔNG TIN USER TỪ TOKEN ====================
 
-    @GetMapping("/me")
-    public ResponseEntity<ApiResponse> getCurrentUser(@RequestHeader("Authorization") String authHeader) {
+    @GetMapping("/hoso")
+    public ResponseEntity<ApiResponse> getHoSoTaiKhoan(@RequestHeader("Authorization") String authHeader) {
         try {
             String token = authHeader.replace("Bearer ", "");
 
@@ -301,15 +226,22 @@ public class AuthController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(apiResponse);
             }
 
-            String email = jwtUtil.getEmailFromToken(token);
-            int maTK = jwtUtil.getMaTKFromToken(token);
+            // Lấy maTK từ token
+            Integer maTK = jwtUtil.getMaTKFromToken(token);
+
+            // Lấy thông tin hồ sơ từ service
+            var hoSoOpt = authService.getHoSoTaiKhoan(maTK);
+
+            if (hoSoOpt.isEmpty()) {
+                apiResponse.setSuccess(false);
+                apiResponse.setMessage("Không tìm thấy tài khoản!");
+                apiResponse.setData(null);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiResponse);
+            }
 
             apiResponse.setSuccess(true);
-            apiResponse.setMessage("Lấy thông tin user thành công!");
-            apiResponse.setData(Map.of(
-                    "email", email,
-                    "maTK", maTK
-            ));
+            apiResponse.setMessage("Lấy thông tin hồ sơ thành công!");
+            apiResponse.setData(hoSoOpt.get());
             return ResponseEntity.ok(apiResponse);
 
         } catch (Exception e) {

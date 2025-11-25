@@ -93,13 +93,13 @@ public class KhachHangController {
     @PutMapping("/{maKH}")
     public ResponseEntity<ApiResponse> updateKhachHang (@PathVariable("maKH") int maKH, @RequestBody KhachHangDTO khachHangDTO) {
         try{
-
-            if(khachHangService.isExistPhoneNumber(khachHangDTO.getSdt())) {
-                apiResponse.setSuccess(false);
-                apiResponse.setMessage("Số điện thoại đã tồn tại trong hệ thống");
-                apiResponse.setData(null);
-                return ResponseEntity.status(HttpStatus.CONFLICT).body(apiResponse);
-            }
+//
+//            if(khachHangService.isExistPhoneNumber(khachHangDTO.getSdt())) {
+//                apiResponse.setSuccess(false);
+//                apiResponse.setMessage("Số điện thoại đã tồn tại trong hệ thống");
+//                apiResponse.setData(null);
+//                return ResponseEntity.status(HttpStatus.CONFLICT).body(apiResponse);
+//            }
 
             khachHangDTO.setMaKH(maKH);
             Optional<KhachHangDTO> updatedDTO = khachHangService.update(khachHangDTO);

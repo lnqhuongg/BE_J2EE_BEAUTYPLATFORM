@@ -12,6 +12,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Optional;
 
 @Component
@@ -26,14 +27,43 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
                                         Authentication authentication) throws IOException {
 
         OAuth2User oauth2User = (OAuth2User) authentication.getPrincipal();
+        OAuth2AuthenticationToken oauthToken = (OAuth2AuthenticationToken) authentication;
 
-        OAuth2AuthenticationToken token = (OAuth2AuthenticationToken) authentication;
-        String provider = token.getAuthorizedClientRegistrationId(); // google | facebook
-
+        String provider = oauthToken.getAuthorizedClientRegistrationId(); // google | facebook
         String email = oauth2User.getAttribute("email");
-        String providerId = provider.equals("google") ? oauth2User.getAttribute("sub") : oauth2User.getAttribute("id");
 
-        Optional<AuthResponseDTO> result = authService.oauth2Login(email, provider, providerId);
+        // Provider ID
+        String providerId = provider.equals("google")
+                ? oauth2User.getAttribute("sub")
+                : oauth2User.getAttribute("id");
+
+        // Loại tài khoản (2 = NCC, 3 = KH)
+        String loaiTKParam = request.getParameter("loaiTK");
+        int loaiTK = (loaiTKParam != null) ? Integer.parseInt(loaiTKParam) : 3;
+
+        // ⭐ Lấy họ tên
+        String fullName = oauth2User.getAttribute("name");
+
+        // ⭐ Lấy avatar (Google & Facebook)
+        String avatar = null;
+
+        if (provider.equals("google")) {
+            avatar = oauth2User.getAttribute("picture");
+        } else if (provider.equals("facebook")) {
+            try {
+                Map<String, Object> picture = oauth2User.getAttribute("picture");
+                if (picture != null) {
+                    Map<String, Object> data = (Map<String, Object>) picture.get("data");
+                    if (data != null) {
+                        avatar = (String) data.get("url");
+                    }
+                }
+            } catch (Exception ignored) {}
+        }
+
+        Optional<AuthResponseDTO> result = authService.oauth2Login(
+                email, loaiTK, provider, providerId, fullName, avatar
+        );
 
         if (result.isEmpty()) {
             response.sendRedirect("http://127.0.0.1:5500/oauth2/error");
@@ -42,7 +72,7 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
 
         String jwt = result.get().getToken();
 
-        // Redirect về front-end (Live Server 5500)
         response.sendRedirect("http://127.0.0.1:5500/client/pages/DangNhap.html?token=" + jwt);
     }
 }
+

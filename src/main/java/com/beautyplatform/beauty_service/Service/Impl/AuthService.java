@@ -188,29 +188,36 @@ public class AuthService implements IAuthService {
     // ==================== OAUTH2 LOGIN ====================
     @Override
     @Transactional
-    public Optional<AuthResponseDTO> oauth2Login(String email, String provider, String providerId) {
+    public Optional<AuthResponseDTO> oauth2Login(String email,
+                                                 int loaiTK,
+                                                 String provider,
+                                                 String providerId,
+                                                 String fullName,
+                                                 String avatarUrl) {
         try {
-            // 1. Tìm hoặc tạo tài khoản
             Optional<TaiKhoan> existingTK = taiKhoanRepository.findByEmail(email);
 
             TaiKhoan taiKhoan;
-            boolean isNewUser = false;
 
             if (existingTK.isPresent()) {
                 taiKhoan = existingTK.get();
 
-                // Update provider info nếu chưa có
-                if (taiKhoan.getProvider() == null || "local".equals(taiKhoan.getProvider())) {
+                // Update provider info nếu login lại bằng OAuth
+                if (taiKhoan.getProvider() == null || taiKhoan.getProvider().equals("local")) {
                     taiKhoan.setProvider(provider);
                     taiKhoan.setProviderId(providerId);
-                    taiKhoan = taiKhoanRepository.save(taiKhoan);
+                    taiKhoanRepository.save(taiKhoan);
                 }
+
             } else {
-                // Tạo tài khoản mới
+                // Nếu Google không trả name → dùng phần trước @
+                String finalName = (fullName != null) ? fullName : email.split("@")[0];
+                String finalAvatar = (avatarUrl != null) ? avatarUrl : "";
+
                 taiKhoan = TaiKhoan.builder()
                         .email(email)
-                        .matKhau(null) // OAuth không cần password
-                        .loaiTK(3) // Mặc định là Khách Hàng
+                        .matKhau(null)
+                        .loaiTK(loaiTK)
                         .trangThai(1)
                         .ngayTao(LocalDateTime.now())
                         .provider(provider)
@@ -218,36 +225,54 @@ public class AuthService implements IAuthService {
                         .build();
 
                 taiKhoan = taiKhoanRepository.save(taiKhoan);
-                isNewUser = true;
 
-                // Tạo profile Khách Hàng
-                KhachHang kh = KhachHang.builder()
-                        .taiKhoan(taiKhoan)
-                        .hoTen(email.split("@")[0]) // Tạm dùng email prefix
-                        .gioiTinh(1)
-                        .ngaySinh(LocalDate.now())
-                        .sdt("")
-                        .hinhAnh("")
-                        .build();
+                // Tạo hồ sơ
+                switch (loaiTK) {
+                    case 3: // KH
+                        khachHangRepository.save(
+                                KhachHang.builder()
+                                        .taiKhoan(taiKhoan)
+                                        .hoTen(finalName)
+                                        .gioiTinh(null)
+                                        .ngaySinh(null)
+                                        .sdt(null)
+                                        .hinhAnh(finalAvatar)
+                                        .build()
+                        );
+                        break;
 
-                khachHangRepository.save(kh);
+                    case 2: // NCC
+                        nhaCungCapRepository.save(
+                                NhaCungCap.builder()
+                                        .taiKhoan(taiKhoan)
+                                        .tenNCC(finalName)
+                                        .diaChi("")
+//                                        .hinhAnh(finalAvatar)
+                                        .build()
+                        );
+                        break;
+
+                    default:
+                        throw new RuntimeException("Loại tài khoản không hợp lệ!");
+                }
             }
 
-            // 2. Generate JWT
+            // Generate JWT
             String token = jwtUtil.generateToken(
                     taiKhoan.getEmail(),
                     taiKhoan.getMaTK(),
                     taiKhoan.getLoaiTK()
             );
 
-            // 3. Build response
-            return Optional.of(AuthResponseDTO.builder()
-                    .token(token)
-                    .maTK(taiKhoan.getMaTK())
-                    .email(taiKhoan.getEmail())
-                    .loaiTK(taiKhoan.getLoaiTK())
-                    .provider(provider)
-                    .build());
+            return Optional.of(
+                    AuthResponseDTO.builder()
+                            .token(token)
+                            .maTK(taiKhoan.getMaTK())
+                            .email(taiKhoan.getEmail())
+                            .loaiTK(taiKhoan.getLoaiTK())
+                            .provider(provider)
+                            .build()
+            );
 
         } catch (Exception e) {
             System.err.println("Lỗi OAuth2 login: " + e.getMessage());
@@ -299,6 +324,46 @@ public class AuthService implements IAuthService {
             System.err.println("Lỗi đổi mật khẩu: " + e.getMessage());
             return Optional.empty();
         }
+    }
+
+    @Override
+    public Optional<HoSoTaiKhoanDTO> getHoSoTaiKhoan(Integer maTK) {
+        Optional<TaiKhoan> taiKhoanOpt = taiKhoanRepository.findById(maTK);
+        if (taiKhoanOpt.isEmpty()) return Optional.empty();
+
+        TaiKhoan tk = taiKhoanOpt.get();
+        HoSoTaiKhoanDTO dto = HoSoTaiKhoanDTO.builder()
+                .maTK(tk.getMaTK())
+                .email(tk.getEmail())
+                .loaiTK(tk.getLoaiTK())
+                .trangThai(tk.getTrangThai())
+                .provider(tk.getProvider())
+                .build();
+
+        // Nếu là Khách Hàng
+        if (tk.getLoaiTK() == 3) {
+            khachHangRepository.findByTaiKhoan(tk).ifPresent(kh -> {
+                dto.setMaKH(kh.getMaKH());
+                dto.setHoTen(kh.getHoTen());
+                dto.setGioiTinh(kh.getGioiTinh());
+                dto.setNgaySinh(kh.getNgaySinh());
+                dto.setSdt(kh.getSdt());
+                dto.setHinhAnh(kh.getHinhAnh());
+            });
+        }
+
+        // Nếu là Nhà Cung Cấp
+        else if (tk.getLoaiTK() == 2) {
+            nhaCungCapRepository.findByTaiKhoan(tk).ifPresent(ncc -> {
+                dto.setMaNCC(ncc.getMaNCC());
+                dto.setTenNCC(ncc.getTenNCC());
+                dto.setDiaChi(ncc.getDiaChi());
+                dto.setGioiThieu(ncc.getGioiThieu());
+                dto.setMaLH(ncc.getLoaiHinhKinhDoanh().getMaLH());
+            });
+        }
+
+        return Optional.of(dto);
     }
 
     // ==================== VALIDATE TOKEN ====================

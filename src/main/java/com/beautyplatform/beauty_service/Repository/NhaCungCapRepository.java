@@ -1,12 +1,16 @@
 package com.beautyplatform.beauty_service.Repository;
 
+import com.beautyplatform.beauty_service.Model.KhachHang;
 import com.beautyplatform.beauty_service.Model.NhaCungCap;
+import com.beautyplatform.beauty_service.Model.TaiKhoan;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
 
 @Repository
 public interface NhaCungCapRepository extends JpaRepository<NhaCungCap, Integer> {
@@ -25,4 +29,5 @@ public interface NhaCungCapRepository extends JpaRepository<NhaCungCap, Integer>
             @Param("diaChi") String diaChi,
             Pageable pageable
     );
+    Optional<NhaCungCap> findByTaiKhoan(TaiKhoan taiKhoan);
 }

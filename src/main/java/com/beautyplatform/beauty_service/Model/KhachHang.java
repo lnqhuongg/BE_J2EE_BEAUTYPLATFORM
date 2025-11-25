@@ -28,13 +28,13 @@ public class KhachHang {
     @Column(name = "hoten", nullable = false)
     private String hoTen;
 
-    @Column(name = "gioitinh", nullable = false)
-    private int gioiTinh;
+    @Column(name = "gioitinh", nullable = true)
+    private Integer gioiTinh;
 
-    @Column(name = "ngaysinh", nullable = false)
+    @Column(name = "ngaysinh", nullable = true)
     private LocalDate ngaySinh;
 
-    @Column(name = "sdt", nullable = false)
+    @Column(name = "sdt", nullable = true)
     private String sdt;
 
     @Column(name = "hinhanh", nullable = false)

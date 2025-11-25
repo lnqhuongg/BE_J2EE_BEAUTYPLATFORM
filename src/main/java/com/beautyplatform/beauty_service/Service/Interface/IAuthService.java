@@ -12,7 +12,12 @@ public interface IAuthService {
     Optional<AuthResponseDTO> dangNhap(DangNhapDTO dangNhapDTO);
 
     // Đăng nhập/đăng ký qua OAuth2
-    Optional<AuthResponseDTO> oauth2Login(String email, String provider, String providerId);
+    Optional<AuthResponseDTO> oauth2Login(String email,
+                                          int loaiTK,
+                                          String provider,
+                                          String providerId,
+                                          String fullName,
+                                          String avatarUrl);
 
     // Quên mật khẩu
     Optional<String> quenMatKhau(QuenMatKhauDTO dto);
@@ -22,4 +27,6 @@ public interface IAuthService {
 
     // Validate token
     boolean validateToken(String token);
+    // Lấy hồ sơ tài khoản
+    Optional<HoSoTaiKhoanDTO> getHoSoTaiKhoan(Integer maTK);
 }
