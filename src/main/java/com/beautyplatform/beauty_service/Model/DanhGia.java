@@ -25,10 +25,6 @@ public class DanhGia {
     @JoinColumn(name = "maDL", nullable = false)
     private DatLich datLich;
 
-    @ManyToOne
-    @JoinColumn(name = "maKH", nullable = false)
-    private KhachHang khachHang;
-
     @Column(name = "diemDG", nullable = false)
     private int diemDanhGia;
 

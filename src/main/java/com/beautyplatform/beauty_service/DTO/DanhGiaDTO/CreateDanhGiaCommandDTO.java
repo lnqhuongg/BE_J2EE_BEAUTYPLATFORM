@@ -9,10 +9,9 @@ import java.time.LocalDate;
 @Builder
 @Getter
 @Setter
-public class DanhGiaDTO {
-    private int maDG;
+
+public class CreateDanhGiaCommandDTO {
     private int maDL;
     private int diemDanhGia;
     private String noiDung;
-    private LocalDate ngayDanhGia;
 }

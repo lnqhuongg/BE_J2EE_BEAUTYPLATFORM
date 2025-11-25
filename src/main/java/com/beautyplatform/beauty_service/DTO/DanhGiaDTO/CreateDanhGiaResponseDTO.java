@@ -1,5 +1,7 @@
 package com.beautyplatform.beauty_service.DTO.DanhGiaDTO;
 
+import com.beautyplatform.beauty_service.Model.DatLich;
+import com.beautyplatform.beauty_service.Model.KhachHang;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -9,9 +11,9 @@ import java.time.LocalDate;
 @Builder
 @Getter
 @Setter
-public class DanhGiaDTO {
+public class CreateDanhGiaResponseDTO {
     private int maDG;
-    private int maDL;
+    private DatLich datLich;
     private int diemDanhGia;
     private String noiDung;
     private LocalDate ngayDanhGia;
