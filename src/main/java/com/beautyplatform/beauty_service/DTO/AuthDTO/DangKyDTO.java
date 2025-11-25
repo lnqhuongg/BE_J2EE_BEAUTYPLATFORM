@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.time.LocalDate;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -34,6 +36,6 @@ public class DangKyDTO {
     // Thông tin bổ sung cho KhachHang
     private String hoTen;
     private Integer gioiTinh;
-    private String ngaySinh;
+    private LocalDate ngaySinh;
     private String sdt;
 }

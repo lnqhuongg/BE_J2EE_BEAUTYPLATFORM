@@ -1,9 +1,6 @@
 package com.beautyplatform.beauty_service.Service.Impl;
 
-import com.beautyplatform.beauty_service.DTO.NhaCungCapDTO.NhaCungCapDTO;
-import com.beautyplatform.beauty_service.DTO.NhaCungCapDTO.NhaCungCapGioLamViecDTO;
-import com.beautyplatform.beauty_service.DTO.NhaCungCapDTO.NhaCungCapHinhAnhDTO;
-import com.beautyplatform.beauty_service.DTO.NhaCungCapDTO.TimKiemNhaCungCapDTO;
+import com.beautyplatform.beauty_service.DTO.NhaCungCapDTO.*;
 import com.beautyplatform.beauty_service.Mapper.NhaCungCapGioLamViecMapper;
 import com.beautyplatform.beauty_service.Mapper.NhaCungCapHinhAnhMapper;
 import com.beautyplatform.beauty_service.Mapper.NhaCungCapMapper;
@@ -40,34 +37,39 @@ public class NhaCungCapService implements INhaCungCapService {
     // ==================== CRUD NHÀ CUNG CẤP ====================
 
     @Override
-    public Page<NhaCungCapDTO> getAllAndSearchWithPage(TimKiemNhaCungCapDTO timKiemNhaCungCapDTO,
-                                                       Pageable pageable) {
+    public Page<NhaCungCapResponseDTO> getAllAndSearchWithPage(
+            TimKiemNhaCungCapDTO timKiemDTO,
+            Pageable pageable) {
         try {
+            // Gọi repository search
             Page<NhaCungCap> pageEntity = repository.searchWithPage(
-                    timKiemNhaCungCapDTO.getMaNCC(),
-                    timKiemNhaCungCapDTO.getMaLH(),
-                    timKiemNhaCungCapDTO.getTenNCC(),
-                    timKiemNhaCungCapDTO.getDiaChi(),
-                    timKiemNhaCungCapDTO.getEmail(),
+                    timKiemDTO.getMaNCC(),
+                    timKiemDTO.getMaTK(),
+                    timKiemDTO.getMaLH(),
+                    timKiemDTO.getTenNCC(),
+                    timKiemDTO.getDiaChi(),
                     pageable
             );
 
-            return pageEntity.map(NhaCungCapMapper::toDTO);
+            // Map sang ResponseDTO (có đầy đủ thông tin)
+            return pageEntity.map(NhaCungCapMapper::toResponseDTO);
 
         } catch (Exception e) {
-            System.err.println("Lỗi khi tìm kiếm nhà cung cấp có phân trang: " + e.getMessage());
+            System.err.println("Lỗi khi lấy danh sách NCC: " + e.getMessage());
             return Page.empty(pageable);
         }
     }
 
     @Override
-    public Optional<NhaCungCapDTO> getById(int maNCC) {
+    public Optional<NhaCungCapResponseDTO> getById(int maNCC) {
         try {
             NhaCungCap entity = repository.findById(maNCC)
-                    .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy nhà cung cấp: " + maNCC));
-            return Optional.of(NhaCungCapMapper.toDTO(entity));
+                    .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy NCC: " + maNCC));
+
+            return Optional.of(NhaCungCapMapper.toResponseDTO(entity));
+
         } catch (Exception e) {
-            System.err.println("Lỗi khi tìm nhà cung cấp: " + e.getMessage());
+            System.err.println("Lỗi khi tìm NCC: " + e.getMessage());
             return Optional.empty();
         }
     }
