@@ -25,7 +25,4 @@ public class YeuThich {
     @ManyToOne
     @JoinColumn(name = "maNCC", nullable = false)
     private NhaCungCap nhaCungCap;
-
-    @Column(name = "ngaytao", nullable = false)
-    private LocalDateTime ngayTao;
 }
