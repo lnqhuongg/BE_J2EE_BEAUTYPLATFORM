@@ -2,11 +2,9 @@ package com.beautyplatform.beauty_service.Service.Impl;
 
 import com.beautyplatform.beauty_service.DTO.DanhGiaDTO.CreateDanhGiaCommandDTO;
 import com.beautyplatform.beauty_service.DTO.DanhGiaDTO.CreateDanhGiaResponseDTO;
-import com.beautyplatform.beauty_service.DTO.DanhGiaDTO.DanhGiaDTO;
 import com.beautyplatform.beauty_service.Mapper.DanhGiaMapper;
 import com.beautyplatform.beauty_service.Model.DanhGia;
 import com.beautyplatform.beauty_service.Model.DatLich;
-import com.beautyplatform.beauty_service.Model.KhachHang;
 import com.beautyplatform.beauty_service.Repository.DanhGiaRepository;
 import com.beautyplatform.beauty_service.Repository.DatLichRepository;
 import com.beautyplatform.beauty_service.Repository.KhachHangRepository;
