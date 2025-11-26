@@ -27,4 +27,6 @@ public interface NhanVienRepository extends JpaRepository<NhanVien, Integer> {
             @Param("keyword") String keyword,
             Pageable pageable
     );
+
+    List<NhanVien> findByNhaCungCap_MaNCC(int maNCC);
 }

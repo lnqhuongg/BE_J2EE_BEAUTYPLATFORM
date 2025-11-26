@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -132,6 +133,32 @@ public class DichVuController {
             apiResponse.setMessage("Đã xảy ra lỗi: " + e.getMessage());
             apiResponse.setData(null);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse); // HTTP 500
+        }
+    }
+
+    @GetMapping("/ldv/{maLDV}/ncc/{maNCC}")
+    public ResponseEntity<ApiResponse> getAllDichVubyLDVNCC(
+            @PathVariable("maLDV") int maLDV,
+            @PathVariable("maNCC") int maNCC) {
+        try {
+            Optional<List<DichVuDTO>> list = dichVuService.getDichVuByNccAndLDV(maLDV,maNCC);
+
+            if (list.isEmpty() || list.get().isEmpty()) {
+                apiResponse.setSuccess(false);
+                apiResponse.setMessage("Không tìm thấy dịch vụ có " + maLDV + "/" + maNCC);
+                apiResponse.setData(null);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiResponse); // 404
+            }
+            apiResponse.setSuccess(true);
+            apiResponse.setMessage("Lấy danh sách Dịch vụ theo Loại dịch vụ và Nhà cung cấp thành công!");
+            apiResponse.setData(list); // nếu rỗng → FE tự xử lý
+            return ResponseEntity.ok(apiResponse);
+
+        } catch (Exception e) {
+            apiResponse.setSuccess(false);
+            apiResponse.setMessage("Đã xảy ra lỗi: " + e.getMessage());
+            apiResponse.setData(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse);
         }
     }
 }

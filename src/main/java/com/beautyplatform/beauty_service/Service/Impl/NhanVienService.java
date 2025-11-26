@@ -116,4 +116,11 @@ public class NhanVienService implements INhanVienService {
             return Optional.empty();
         }
     }
+
+    public Optional<List<NhanVienDTO>> getNhanVienByNcc(int ncc){
+        return Optional.of(repository.findByNhaCungCap_MaNCC(ncc)
+                .stream()
+                .map(NhanVienMapper::toDTO)
+                .toList());
+    }
 }

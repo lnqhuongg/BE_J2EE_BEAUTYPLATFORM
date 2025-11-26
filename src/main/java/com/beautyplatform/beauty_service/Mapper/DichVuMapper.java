@@ -67,4 +67,18 @@ public class DichVuMapper {
                 .trangThai(dichVu.getTrangThai())
                 .build();
     }
+
+    public  static  DichVuDTO toSimpleDTO(DichVu dichVu) {
+        return DichVuDTO.builder()
+                .maDV(dichVu.getMaDV())
+                .maLDV(dichVu.getLoaiDichVu().getMaLDV())
+                .maNCC(dichVu.getNhaCungCap().getMaNCC())
+                .maKM(dichVu.getKhuyenMai().getMaKM())
+                .tenDV(dichVu.getTenDV())
+                .moTa(dichVu.getMoTa())
+                .gia(dichVu.getGia())
+                .thoiLuong(dichVu.getThoiLuong())
+                .trangThai(dichVu.getTrangThai())
+                .build();
+    }
 }

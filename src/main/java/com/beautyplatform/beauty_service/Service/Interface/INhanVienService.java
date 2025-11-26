@@ -24,4 +24,6 @@ public interface INhanVienService {
     public Optional<NhanVienDTO> getByNhanVienId(int id);
 
     Page<NhanVienDTO> getAll(Pageable pageable);
+
+    Optional<List<NhanVienDTO>> getNhanVienByNcc(int ncc);
 }
