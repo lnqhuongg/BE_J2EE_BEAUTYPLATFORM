@@ -107,4 +107,12 @@ public class LoaiDichVuService implements ILoaiDichVuService {
             return Optional.empty();
         }
     }
+
+    @Override
+    public Optional<List<LoaiDichVuDTO>> getByIdNCC(int maNCC){
+        return Optional.of(repository.findLoaiDichVuByMaNcc(maNCC)
+                .stream()
+                .map(LoaiDichVuMapper::toDTO)
+                .toList());
+    }
 }
