@@ -29,4 +29,6 @@ public interface IAuthService {
     boolean validateToken(String token);
     // Lấy hồ sơ tài khoản
     Optional<HoSoTaiKhoanDTO> getHoSoTaiKhoan(Integer maTK);
+
+    boolean isEmailExists(String email);
 }

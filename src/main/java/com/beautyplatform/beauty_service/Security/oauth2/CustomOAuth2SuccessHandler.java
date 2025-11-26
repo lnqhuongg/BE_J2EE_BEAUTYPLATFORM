@@ -72,7 +72,7 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
 
         String jwt = result.get().getToken();
 
-        response.sendRedirect("http://127.0.0.1:5500/client/pages/DangNhap.html?token=" + jwt);
+        response.sendRedirect("http://127.0.0.1:5500/client/pages/Auth.html?token=" + jwt);
     }
 }
 

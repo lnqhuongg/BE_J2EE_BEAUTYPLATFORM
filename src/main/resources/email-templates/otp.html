@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f8f8f8;
+            padding: 20px;
+        }
+        .box {
+            max-width: 450px;
+            margin: auto;
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 25px 20px;
+            border: 1px solid #e0e0e0;
+        }
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #d63384; /* màu hồng đặc trưng ngành beauty */
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .otp {
+            font-size: 36px;
+            color: #d63384;
+            font-weight: bold;
+            text-align: center;
+            letter-spacing: 6px;
+            margin: 20px 0;
+        }
+        h2 {
+            color: #333333;
+            font-size: 20px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        p {
+            font-size: 15px;
+            color: #555555;
+            line-height: 1.6;
+            text-align: center;
+        }
+        .footer {
+            margin-top: 25px;
+            font-size: 13px;
+            color: #888888;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="box">
+    <div class="logo">Freshj</div>
+
+    <h2>Xin chào!</h2>
+
+    <p>Mã OTP của bạn để đăng ký là:</p>
+
+    <div class="otp">{{OTP}}</div>
+
+    <p>Vui lòng không chia sẻ mã này với bất kỳ ai để bảo mật tài khoản.</p>
+
+    <div class="footer">
+        Email này được gửi tự động bởi Freshj. Vui lòng không trả lời.
+    </div>
+</div>
+</body>
+</html>

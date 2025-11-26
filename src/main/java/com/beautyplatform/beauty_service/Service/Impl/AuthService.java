@@ -366,6 +366,11 @@ public class AuthService implements IAuthService {
         return Optional.of(dto);
     }
 
+    @Override
+    public boolean isEmailExists(String email){
+        return taiKhoanRepository.findByEmail(email).isPresent();
+    }
+
     // ==================== VALIDATE TOKEN ====================
     @Override
     public boolean validateToken(String token) {

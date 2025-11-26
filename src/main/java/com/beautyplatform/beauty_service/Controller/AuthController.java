@@ -6,6 +6,7 @@ import com.beautyplatform.beauty_service.DTO.KhachHangDTO.KhachHangDTO;
 import com.beautyplatform.beauty_service.Helper.ApiResponse;
 import com.beautyplatform.beauty_service.Model.TaiKhoan;
 import com.beautyplatform.beauty_service.Repository.TaiKhoanRepository;
+import com.beautyplatform.beauty_service.Service.Impl.OTPService;
 import com.beautyplatform.beauty_service.Service.Interface.IAuthService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,9 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
+
+    @Autowired
+    private OTPService otpService;
 
     @Autowired
     private IAuthService authService;
@@ -69,7 +73,7 @@ public class AuthController {
                 apiResponse.setSuccess(false);
                 apiResponse.setMessage("Email hoặc mật khẩu không đúng!");
                 apiResponse.setData(null);
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(apiResponse);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiResponse);
             }
 
             apiResponse.setSuccess(true);
@@ -211,6 +215,26 @@ public class AuthController {
         apiResponse.setData(null);
         return ResponseEntity.ok(apiResponse);
     }
+    // ==================== KIỂM TRA EMAIL TỒN TẠI ====================
+    @GetMapping("/check-email")
+    public ResponseEntity<ApiResponse> checkEmail(@RequestParam String email) {
+        try {
+            boolean exists = authService.isEmailExists(email); // phương thức kiểm tra email trong service
+
+            apiResponse.setSuccess(true);
+            apiResponse.setMessage("Kiểm tra email thành công");
+            apiResponse.setData(Map.of("exists", exists));
+
+            return ResponseEntity.ok(apiResponse);
+
+        } catch (Exception e) {
+            apiResponse.setSuccess(false);
+            apiResponse.setMessage("Đã xảy ra lỗi: " + e.getMessage());
+            apiResponse.setData(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse);
+        }
+    }
+
 
     // ==================== LẤY THÔNG TIN USER TỪ TOKEN ====================
 
@@ -242,6 +266,51 @@ public class AuthController {
             apiResponse.setSuccess(true);
             apiResponse.setMessage("Lấy thông tin hồ sơ thành công!");
             apiResponse.setData(hoSoOpt.get());
+            return ResponseEntity.ok(apiResponse);
+
+        } catch (Exception e) {
+            apiResponse.setSuccess(false);
+            apiResponse.setMessage("Đã xảy ra lỗi: " + e.getMessage());
+            apiResponse.setData(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse);
+        }
+    }
+
+    @PostMapping("/send-otp")
+    public ResponseEntity<ApiResponse> sendOtp(@RequestParam String email) {
+        try {
+            otpService.sendOtpEmail(email);
+
+            apiResponse.setSuccess(true);
+            apiResponse.setMessage("OTP đã được gửi thành công!");
+            apiResponse.setData(null);
+            return ResponseEntity.ok(apiResponse);
+
+        } catch (Exception e) {
+            apiResponse.setSuccess(false);
+            apiResponse.setMessage("Gửi OTP thất bại: " + e.getMessage());
+            apiResponse.setData(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse);
+        }
+    }
+
+    @PostMapping("/verify-otp")
+    public ResponseEntity<ApiResponse> verifyOtp(
+            @RequestParam String email,
+            @RequestParam String otp) {
+        try {
+            boolean valid = otpService.verifyOtp(email, otp);
+
+            if (!valid) {
+                apiResponse.setSuccess(false);
+                apiResponse.setMessage("OTP không chính xác!");
+                apiResponse.setData(null);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiResponse);
+            }
+
+            apiResponse.setSuccess(true);
+            apiResponse.setMessage("Xác minh OTP thành công!");
+            apiResponse.setData(null);
             return ResponseEntity.ok(apiResponse);
 
         } catch (Exception e) {
