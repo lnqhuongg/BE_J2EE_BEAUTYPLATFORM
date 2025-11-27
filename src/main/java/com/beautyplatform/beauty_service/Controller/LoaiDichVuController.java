@@ -165,4 +165,29 @@ public class LoaiDichVuController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse);
         }
     }
+
+
+    @GetMapping("ncc/{maNCC}")
+    public ResponseEntity<ApiResponse> getAllLoaiDichVubyNCC(@PathVariable("maNCC") int maNCC) {
+        try{
+            Optional<List<LoaiDichVuDTO>> loaiDichVuDTO = loaiDichVuService.getByIdNCC(maNCC);
+
+            if(loaiDichVuDTO.isEmpty() || loaiDichVuDTO.get().isEmpty()){
+                apiResponse.setSuccess(false);
+                apiResponse.setMessage("Không tìm thấy Loại dịch vụ nào có mã ncc là : " + maNCC);
+                apiResponse.setData(null);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiResponse);
+            }else{
+                apiResponse.setSuccess(true);
+                apiResponse.setMessage("Lấy danh sách loại dịch vụ thành công!");
+                apiResponse.setData(loaiDichVuDTO.get());
+                return ResponseEntity.ok(apiResponse);
+            }
+        }catch (Exception e) {
+            apiResponse.setSuccess(false);
+            apiResponse.setMessage("Đã xảy ra lỗi: " + e.getMessage());
+            apiResponse.setData(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse); // 500
+        }
+    }
 }

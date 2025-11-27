@@ -19,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -146,4 +147,11 @@ public class DichVuService implements IDichVuService {
 //    public Optional<DichVuResponseDTO> delete(DichVuDTO dichVuDTO){
 //        return Optional.of(dichVuDTO);
 //    }
+    @Override
+    public Optional<List<DichVuDTO>> getDichVuByNccAndLDV(int maLDV, int maNCC){
+        return Optional.of(repository.findByLoaiDichVu_MaLDVAndNhaCungCap_MaNCC(maLDV, maNCC)
+                .stream()
+                .map(DichVuMapper::toSimpleDTO)
+                .toList());
+    }
 }

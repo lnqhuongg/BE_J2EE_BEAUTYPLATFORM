@@ -26,4 +26,7 @@ public interface ILoaiDichVuService {
 
     // Lấy loại dịch vụ theo mã
     Optional<LoaiDichVuDTO> getById(int maLDV);
+
+    // Lấy loại dịch vụ theo mã nhà cung cấp
+    Optional<List<LoaiDichVuDTO>> getByIdNCC(int maNCC);
 }

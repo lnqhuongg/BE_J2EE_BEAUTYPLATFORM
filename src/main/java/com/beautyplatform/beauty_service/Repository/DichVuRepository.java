@@ -37,4 +37,6 @@ public interface DichVuRepository extends JpaRepository<DichVu, Integer> {
             @Param("thoiluong") Integer thoiluong,
             Pageable pageable
     );
+
+    List<DichVu> findByLoaiDichVu_MaLDVAndNhaCungCap_MaNCC(int maLDV, int maNCC);
 }

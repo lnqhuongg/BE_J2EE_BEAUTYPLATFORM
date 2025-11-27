@@ -170,4 +170,29 @@ public class NhanVienController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse); // 500
         }
     }
+
+    @GetMapping("ncc/{maNCC}")
+    public ResponseEntity<ApiResponse> getAllNhanVienbyNCC(@PathVariable("maNCC") int maNCC) {
+        try {
+            Optional<List<NhanVienDTO>> nhanVienDTO = nhanVienService.getNhanVienByNcc(maNCC);
+
+            if (nhanVienDTO.isEmpty() || nhanVienDTO.get().isEmpty()) {
+                apiResponse.setSuccess(false);
+                apiResponse.setMessage("Không tìm thấy nhân viên có mã: " + maNCC);
+                apiResponse.setData(null);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiResponse);
+            } else {
+                apiResponse.setSuccess(true);
+                apiResponse.setMessage("Lấy danh sách nhân viên thành công!");
+                apiResponse.setData(nhanVienDTO.get());
+                return ResponseEntity.ok(apiResponse);
+
+            }
+        } catch (Exception e) {
+            apiResponse.setSuccess(false);
+            apiResponse.setMessage("Đã xảy ra lỗi: " + e.getMessage());
+            apiResponse.setData(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse); // 500
+        }
+    }
 }

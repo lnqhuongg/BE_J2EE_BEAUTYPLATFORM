@@ -21,4 +21,13 @@ public interface LoaiDichVuRepository extends JpaRepository<LoaiDichVu, Integer>
 
     @Query("SELECT loai FROM LoaiDichVu loai WHERE LOWER(loai.tenLDV) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     Page<LoaiDichVu> searchWithPage(@Param("keyword") String keyword, Pageable pageable);
+
+    @Query("""
+           SELECT DISTINCT ldv
+           FROM DichVu dv
+           JOIN dv.loaiDichVu ldv
+           WHERE dv.nhaCungCap.maNCC = :maNcc
+             AND ldv.trangThai = 1
+           """)
+    List<LoaiDichVu> findLoaiDichVuByMaNcc(@Param("maNcc") int maNcc);
 }

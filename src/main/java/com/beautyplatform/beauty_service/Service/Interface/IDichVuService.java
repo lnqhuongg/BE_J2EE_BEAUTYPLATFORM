@@ -6,6 +6,7 @@ import com.beautyplatform.beauty_service.DTO.DichVuDTO.TimKiemDichVuDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface IDichVuService {
@@ -20,4 +21,7 @@ public interface IDichVuService {
     //tìm kiếm & bộ lọc
     // lấy theo id (dùng khi nhấn vào modal chỉnh sửa trên giao diện)
     Optional<DichVuResponseDTO> getByDichVuId(int id);
+
+    //lấy theo mã LDV v  ma NCc
+    Optional<List<DichVuDTO>> getDichVuByNccAndLDV(int maLDV, int maNCC);
 }
