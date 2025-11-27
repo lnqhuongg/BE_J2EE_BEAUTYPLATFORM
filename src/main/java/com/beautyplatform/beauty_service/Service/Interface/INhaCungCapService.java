@@ -4,6 +4,7 @@ import com.beautyplatform.beauty_service.DTO.NhaCungCapDTO.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,4 +30,5 @@ public interface INhaCungCapService {
     Optional<NhaCungCapHinhAnhDTO> updateHinhAnh(NhaCungCapHinhAnhDTO dto);
     Optional<NhaCungCapHinhAnhDTO> deleteHinhAnh(int maHinhAnh);
     Optional<List<NhaCungCapHinhAnhDTO>> getHinhAnhByNCC(int maNCC);
+    List<LocalDate> getInvalidDates(int maNCC);
 }

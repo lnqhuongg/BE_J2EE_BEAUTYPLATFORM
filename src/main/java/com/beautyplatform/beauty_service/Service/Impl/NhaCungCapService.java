@@ -13,8 +13,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class NhaCungCapService implements INhaCungCapService {
@@ -78,7 +82,7 @@ public class NhaCungCapService implements INhaCungCapService {
     public Optional<NhaCungCapDTO> add(NhaCungCapDTO dto) {
         try {
             // Validate TaiKhoan
-            TaiKhoan taiKhoan = taiKhoanRepository.findById(dto.getMaTK())
+            TaiKhoan taiKhoan =     taiKhoanRepository.findById(dto.getMaTK())
                     .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy tài khoản"));
 
             // Validate LoaiHinh
@@ -260,5 +264,31 @@ public class NhaCungCapService implements INhaCungCapService {
             System.err.println("Lỗi khi xóa hình ảnh: " + e.getMessage());
             return Optional.empty();
         }
+    }
+
+    @Override
+    public List<LocalDate> getInvalidDates(int maNCC) {
+        List<NhaCungCapGioLamViec> list = gioLamViecRepository.findByNhaCungCap_MaNCC(maNCC);
+
+        // Lấy danh sách ngày trong tuần có hoạt động
+        Set<Integer> workingDays = list.stream()
+                .map(NhaCungCapGioLamViec::getNgayTrongTuan) // 2=Thứ 2 ... 8=CN
+                .collect(Collectors.toSet());
+
+        List<LocalDate> invalidDates = new ArrayList<>();
+        LocalDate today = LocalDate.now();
+
+        for (int i = 0; i < 10; i++) {
+            LocalDate day = today.plusDays(i);
+            int thu = day.getDayOfWeek().getValue(); // Mon=1 … Sun=7
+
+            // Map sang format DB (nếu DB bạn dùng CN = 8 → convert)
+            if (thu == 7) thu = 8;
+
+            if (!workingDays.contains(thu)) {
+                invalidDates.add(day);
+            }
+        }
+        return invalidDates;
     }
 }
