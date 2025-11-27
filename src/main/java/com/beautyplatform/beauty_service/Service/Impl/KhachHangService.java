@@ -31,9 +31,6 @@ public class KhachHangService implements IKhachHangService {
     @Autowired
     private TaiKhoanRepository taiKhoanRepository;
 
-    @Autowired
-    private CloudinaryService cloudinaryService;
-
     //lấy toàn bộ khách hàng
     @Override
     public Page<KhachHangDTO> getAll(Pageable pageable) {
@@ -77,24 +74,6 @@ public class KhachHangService implements IKhachHangService {
         if(existing == null){
             return Optional.empty();
         }
-
-        // Nếu có ảnh mới và ảnh cũ tồn tại, xóa ảnh cũ trên Cloudinary
-        if (khachHangDTO.getHinhAnh() != null &&
-                !khachHangDTO.getHinhAnh().equals(existing.getHinhAnh()) &&
-                existing.getHinhAnh() != null &&
-                !existing.getHinhAnh().isEmpty()) {
-
-            try {
-                String oldPublicId = cloudinaryService.extractPublicIdFromUrl(existing.getHinhAnh());
-                if (oldPublicId != null) {
-                    cloudinaryService.deleteImage(oldPublicId);
-                }
-            } catch (Exception e) {
-                System.err.println("Không thể xóa ảnh cũ: " + e.getMessage());
-                // Tiếp tục cập nhật dù xóa ảnh cũ thất bại
-            }
-        }
-
         existing.setHoTen(khachHangDTO.getHoTen());
         existing.setGioiTinh(khachHangDTO.getGioiTinh());
         existing.setNgaySinh(khachHangDTO.getNgaySinh());

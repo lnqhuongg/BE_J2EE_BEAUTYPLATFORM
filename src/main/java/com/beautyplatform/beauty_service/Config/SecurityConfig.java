@@ -50,7 +50,6 @@ public class SecurityConfig {
                         .requestMatchers("/nhanvien/**").permitAll()
                         .requestMatchers("/khuyenmai/**").permitAll()
                         .requestMatchers("/khachhang/**").permitAll()
-                        .requestMatchers("/upload/**").permitAll()
                         // Các endpoint khác cần authentication
 //                        .anyRequest().authenticated()
                                 .anyRequest().permitAll()

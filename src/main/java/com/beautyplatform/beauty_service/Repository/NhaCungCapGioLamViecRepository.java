@@ -11,4 +11,6 @@ public interface NhaCungCapGioLamViecRepository extends JpaRepository<NhaCungCap
 
     // Lấy giờ làm việc theo mã NCC
     List<NhaCungCapGioLamViec> findByNhaCungCap_MaNCC(int maNCC);
+
+    List<NhaCungCapGioLamViec> findByNhaCungCap_MaNCCAndNgayTrongTuan(int maNCC, int ngayTrongTuan);
 }
