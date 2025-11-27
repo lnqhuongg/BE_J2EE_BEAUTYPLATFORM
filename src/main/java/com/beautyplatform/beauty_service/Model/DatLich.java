@@ -3,6 +3,7 @@ package com.beautyplatform.beauty_service.Model;
 import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -33,5 +34,5 @@ public class DatLich {
     private int trangThai;
 
     @Column(name = "ngaytao", nullable = false)
-    private LocalDateTime ngayTao;
+    private LocalDate ngayTao;
 }

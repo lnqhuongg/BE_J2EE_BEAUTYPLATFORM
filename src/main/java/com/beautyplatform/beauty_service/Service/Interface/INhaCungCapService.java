@@ -30,5 +30,4 @@ public interface INhaCungCapService {
     Optional<NhaCungCapHinhAnhDTO> updateHinhAnh(NhaCungCapHinhAnhDTO dto);
     Optional<NhaCungCapHinhAnhDTO> deleteHinhAnh(int maHinhAnh);
     Optional<List<NhaCungCapHinhAnhDTO>> getHinhAnhByNCC(int maNCC);
-    List<LocalDate> getInvalidDates(int maNCC);
 }
