@@ -100,9 +100,10 @@ public class DatLichService implements IDatLichService {
 
         List<LocalDate> validDates = new ArrayList<>();
         LocalDate today = LocalDate.now();
+        LocalDate startDay = today.plusDays(1);
 
         for (int i = 0; i < 10; i++) {
-            LocalDate day = today.plusDays(i);
+            LocalDate day = startDay.plusDays(i);
             int thu = day.getDayOfWeek().getValue();
 
             if (workingDays.contains(thu)) {
