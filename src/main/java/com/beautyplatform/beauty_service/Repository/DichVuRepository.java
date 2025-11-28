@@ -1,6 +1,7 @@
 package com.beautyplatform.beauty_service.Repository;
 
 import com.beautyplatform.beauty_service.Model.DichVu;
+import com.beautyplatform.beauty_service.Model.NhaCungCap;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

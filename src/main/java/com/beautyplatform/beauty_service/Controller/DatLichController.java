@@ -2,9 +2,9 @@ package com.beautyplatform.beauty_service.Controller;
 
 import com.beautyplatform.beauty_service.DTO.DatLichDTO.CTDatLichDTO;
 import com.beautyplatform.beauty_service.DTO.DatLichDTO.DatLichDTO;
+import com.beautyplatform.beauty_service.DTO.DatLichDTO.DatLichResponseDTO;
 import com.beautyplatform.beauty_service.Helper.ApiResponse;
 import com.beautyplatform.beauty_service.Service.Interface.IDatLichService;
-import com.beautyplatform.beauty_service.Service.Interface.INhaCungCapService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -22,11 +22,10 @@ public class DatLichController {
     @Autowired
     private IDatLichService datLichService;
 
-
     @Autowired
     private ApiResponse apiResponse;
 
-    // những ngày ncc không làm việc
+    // Những ngày ncc không làm việc
     @GetMapping("/valid-dates/{maNCC}")
     public ResponseEntity<ApiResponse> getInvalidDates(@PathVariable int maNCC) {
         try {
@@ -45,13 +44,13 @@ public class DatLichController {
         }
     }
 
-    // những ngày, giờ rảnh của nhân viên
+    // Những ngày, giờ rảnh của nhân viên
     @GetMapping("/available-times")
     public ResponseEntity<ApiResponse> getAvailableTimes(
             @RequestParam int maNCC,
             @RequestParam int maNV,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate ngay,
-            @RequestParam int giodichvu // tính bằng phút
+            @RequestParam int giodichvu
     ) {
         try {
             List<LocalTime> list = datLichService.getAvailableTimes(maNCC, maNV, ngay, giodichvu);
@@ -69,6 +68,7 @@ public class DatLichController {
         }
     }
 
+    // Tạo đặt lịch mới
     @PostMapping
     public ResponseEntity<ApiResponse> addDatLich(@RequestBody DatLichDTO dto) {
         try {
@@ -94,6 +94,7 @@ public class DatLichController {
         }
     }
 
+    // Thêm chi tiết đặt lịch
     @PostMapping("/{maDL}/ct")
     public ResponseEntity<ApiResponse> addCTDatLich(
             @PathVariable int maDL,
@@ -112,6 +113,74 @@ public class DatLichController {
             api.setSuccess(false);
             api.setMessage("Đã xảy ra lỗi: " + e.getMessage());
             api.setData(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(api);
+        }
+    }
+
+    // ========== API MỚI: XEM LỊCH HẸN CỦA KHÁCH HÀNG ==========
+
+    // Lấy tất cả lịch hẹn của khách hàng
+    @GetMapping("/khachhang/{maKH}")
+    public ResponseEntity<ApiResponse> getByKhachHang(@PathVariable int maKH) {
+        ApiResponse api = new ApiResponse();
+        try {
+            List<DatLichResponseDTO> list = datLichService.getByKhachHang(maKH);
+
+            api.setSuccess(true);
+            api.setMessage("Lấy danh sách lịch hẹn thành công!");
+            api.setData(list);
+
+            return ResponseEntity.ok(api);
+        } catch (Exception e) {
+            api.setSuccess(false);
+            api.setMessage("Lỗi: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(api);
+        }
+    }
+
+    // Lấy lịch hẹn của khách hàng theo trạng thái
+    @GetMapping("/khachhang/{maKH}/trangthai/{trangThai}")
+    public ResponseEntity<ApiResponse> getByKhachHangAndTrangThai(
+            @PathVariable int maKH,
+            @PathVariable int trangThai
+    ) {
+        ApiResponse api = new ApiResponse();
+        try {
+            List<DatLichResponseDTO> list = datLichService.getByKhachHangAndTrangThai(maKH, trangThai);
+
+            api.setSuccess(true);
+            api.setMessage("Lấy danh sách lịch hẹn theo trạng thái thành công!");
+            api.setData(list);
+
+            return ResponseEntity.ok(api);
+        } catch (Exception e) {
+            api.setSuccess(false);
+            api.setMessage("Lỗi: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(api);
+        }
+    }
+
+    // Lấy chi tiết một lịch hẹn
+    @GetMapping("/{maDL}")
+    public ResponseEntity<ApiResponse> getById(@PathVariable int maDL) {
+        ApiResponse api = new ApiResponse();
+        try {
+            Optional<DatLichResponseDTO> result = datLichService.getById(maDL);
+
+            if (result.isEmpty()) {
+                api.setSuccess(false);
+                api.setMessage("Không tìm thấy lịch hẹn!");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(api);
+            }
+
+            api.setSuccess(true);
+            api.setMessage("Lấy chi tiết lịch hẹn thành công!");
+            api.setData(result.get());
+
+            return ResponseEntity.ok(api);
+        } catch (Exception e) {
+            api.setSuccess(false);
+            api.setMessage("Lỗi: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(api);
         }
     }
