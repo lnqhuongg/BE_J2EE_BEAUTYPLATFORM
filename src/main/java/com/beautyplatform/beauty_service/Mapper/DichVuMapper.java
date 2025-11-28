@@ -69,11 +69,25 @@ public class DichVuMapper {
     }
 
     public  static  DichVuDTO toSimpleDTO(DichVu dichVu) {
+        KhuyenMai km = dichVu.getKhuyenMai();
+        KhuyenMaiDTO kmDTO = null;
+
+        if (km != null) {
+            kmDTO = new KhuyenMaiDTO(
+                    km.getMaKM(),
+                    km.getNhaCungCap().getMaNCC(),
+                    km.getMoTa(),
+                    km.getPhanTram(),
+                    km.getNgayBatDau(),
+                    km.getNgayKetThuc(),
+                    km.getTrangThai()
+            );
+        }
         return DichVuDTO.builder()
                 .maDV(dichVu.getMaDV())
                 .maLDV(dichVu.getLoaiDichVu().getMaLDV())
                 .maNCC(dichVu.getNhaCungCap().getMaNCC())
-                .maKM(dichVu.getKhuyenMai().getMaKM())
+                .maKM(kmDTO != null ? kmDTO.getMaKM() : null)
                 .tenDV(dichVu.getTenDV())
                 .moTa(dichVu.getMoTa())
                 .gia(dichVu.getGia())

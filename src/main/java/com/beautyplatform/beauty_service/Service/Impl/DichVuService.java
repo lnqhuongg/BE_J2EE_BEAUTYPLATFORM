@@ -142,11 +142,6 @@ public class DichVuService implements IDichVuService {
         return Optional.of(DichVuMapper.toDTO(saveDV));
     }
 
-    // xóa -- đang xem xét có nên cho xóa hay không
-//    @Override
-//    public Optional<DichVuResponseDTO> delete(DichVuDTO dichVuDTO){
-//        return Optional.of(dichVuDTO);
-//    }
     @Override
     public Optional<List<DichVuDTO>> getDichVuByNccAndLDV(int maLDV, int maNCC){
         return Optional.of(repository.findByLoaiDichVu_MaLDVAndNhaCungCap_MaNCC(maLDV, maNCC)

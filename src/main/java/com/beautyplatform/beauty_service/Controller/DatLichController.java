@@ -115,5 +115,4 @@ public class DatLichController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(api);
         }
     }
-
 }
