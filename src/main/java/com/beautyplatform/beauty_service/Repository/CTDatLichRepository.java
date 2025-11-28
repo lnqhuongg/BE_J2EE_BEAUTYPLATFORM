@@ -9,15 +9,26 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface CTDatLichRepository extends JpaRepository<CTDatLich, Integer> {
+
     @Query("""
-                SELECT ct 
-                FROM CTDatLich ct
-                JOIN ct.datLich dl
-                WHERE ct.nhanVien.maNV = :maNV
-                  AND dl.ngayTao = :ngay
-            """)
+        SELECT ct 
+        FROM CTDatLich ct
+        JOIN ct.datLich dl
+        WHERE ct.nhanVien.maNV = :maNV
+          AND dl.ngayTao = :ngay
+    """)
     List<CTDatLich> findBusyTimeByNhanVienAndDate(
             @Param("maNV") int maNV,
             @Param("ngay") LocalDate ngay
     );
+
+    // Lấy chi tiết đặt lịch theo mã đặt lịch
+    @Query("""
+        SELECT ct FROM CTDatLich ct
+        LEFT JOIN FETCH ct.dichVu
+        LEFT JOIN FETCH ct.nhanVien
+        WHERE ct.datLich.maDL = :maDL
+        ORDER BY ct.thoiGianBatDau
+    """)
+    List<CTDatLich> findByDatLichWithDetails(@Param("maDL") int maDL);
 }

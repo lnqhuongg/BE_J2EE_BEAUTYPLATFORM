@@ -2,8 +2,10 @@ package com.beautyplatform.beauty_service.Service.Impl;
 
 import com.beautyplatform.beauty_service.DTO.DatLichDTO.CTDatLichDTO;
 import com.beautyplatform.beauty_service.DTO.DatLichDTO.DatLichDTO;
+import com.beautyplatform.beauty_service.DTO.DatLichDTO.DatLichResponseDTO;
 import com.beautyplatform.beauty_service.Mapper.CTDatLichMapper;
 import com.beautyplatform.beauty_service.Mapper.DatLichMapper;
+import com.beautyplatform.beauty_service.Mapper.DatLichResponseMapper;
 import com.beautyplatform.beauty_service.Model.*;
 import com.beautyplatform.beauty_service.Repository.*;
 import com.beautyplatform.beauty_service.Service.Interface.IDatLichService;
@@ -44,33 +46,29 @@ public class DatLichService implements IDatLichService {
             int maNCC,
             int maNV,
             LocalDate ngay,
-            int giodichvu // phút
+            int giodichvu
     ) {
         int thu = ngay.getDayOfWeek().getValue();
         if (thu == 7) thu = 8;
 
-        // --- Lấy ca làm việc ---
         NhaCungCapGioLamViec caLam =
                 gioLamViecRepository
                         .findByNhaCungCap_MaNCCAndNgayTrongTuan(maNCC, thu)
                         .stream().findFirst().orElse(null);
 
         if (caLam == null)
-            return Collections.emptyList(); // không làm việc → không có giờ
+            return Collections.emptyList();
 
         LocalTime moCua = caLam.getGioMoCua();
         LocalTime dongCua = caLam.getGioDongCua();
 
-        // --- Lấy giờ bận của nhân viên ---
         List<CTDatLich> busyList =
                 ctDatLichRepository.findBusyTimeByNhanVienAndDate(maNV, ngay);
 
-        // --- Sinh timeline ---
         List<LocalTime> result = new ArrayList<>();
         LocalTime cursor = moCua;
 
         while (cursor.plusMinutes(giodichvu).isBefore(dongCua.plusSeconds(1))) {
-
             LocalTime start = cursor;
             LocalTime end = cursor.plusMinutes(giodichvu);
 
@@ -86,7 +84,7 @@ public class DatLichService implements IDatLichService {
                 result.add(start);
             }
 
-            cursor = cursor.plusMinutes(90); // step = 30 phút
+            cursor = cursor.plusMinutes(90);
         }
 
         return result;
@@ -105,7 +103,7 @@ public class DatLichService implements IDatLichService {
 
         for (int i = 0; i < 10; i++) {
             LocalDate day = today.plusDays(i);
-            int thu = day.getDayOfWeek().getValue(); // 1–7
+            int thu = day.getDayOfWeek().getValue();
 
             if (workingDays.contains(thu)) {
                 validDates.add(day);
@@ -114,7 +112,6 @@ public class DatLichService implements IDatLichService {
         return validDates;
     }
 
-
     private boolean timeOverlap(LocalTime s1, LocalTime e1, LocalTime s2, LocalTime e2) {
         return !e1.isBefore(s2) && !e2.isBefore(s1);
     }
@@ -122,12 +119,10 @@ public class DatLichService implements IDatLichService {
     @Override
     public Optional<DatLichDTO> add(DatLichDTO dto) {
         try {
-            // Validate khách hàng
             KhachHang kh = khachHangRepository.findById(dto.getMaKH())
                     .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy khách hàng"));
 
             DatLich entity = DatLichMapper.toEntity(dto, kh);
-
             DatLich saved = datLichRepository.save(entity);
 
             return Optional.of(DatLichMapper.toDTO(saved));
@@ -139,14 +134,12 @@ public class DatLichService implements IDatLichService {
 
     @Override
     public List<CTDatLichDTO> addCTDatLichList(int maDL, List<CTDatLichDTO> list) {
-
         DatLich datLich = datLichRepository.findById(maDL)
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy đặt lịch!"));
 
         List<CTDatLich> entities = new ArrayList<>();
 
         for (CTDatLichDTO dto : list) {
-
             DichVu dv = dichVuRepository.findById(dto.getMaDV())
                     .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy dịch vụ"));
 
@@ -164,4 +157,40 @@ public class DatLichService implements IDatLichService {
                 .toList();
     }
 
+    @Override
+    public List<DatLichResponseDTO> getByKhachHang(int maKH) {
+        List<DatLich> datLichList = datLichRepository.findByKhachHangWithDetails(maKH);
+
+        return datLichList.stream()
+                .map(dl -> {
+                    List<CTDatLich> chiTiet = ctDatLichRepository.findByDatLichWithDetails(dl.getMaDL());
+                    return DatLichResponseMapper.toResponseDTO(dl, chiTiet);
+                })
+                .toList();
+    }
+
+    @Override
+    public List<DatLichResponseDTO> getByKhachHangAndTrangThai(int maKH, int trangThai) {
+        List<DatLich> datLichList = datLichRepository
+                .findByKhachHang_MaKHAndTrangThaiOrderByNgayTaoDesc(maKH, trangThai);
+
+        return datLichList.stream()
+                .map(dl -> {
+                    List<CTDatLich> chiTiet = ctDatLichRepository.findByDatLichWithDetails(dl.getMaDL());
+                    return DatLichResponseMapper.toResponseDTO(dl, chiTiet);
+                })
+                .toList();
+    }
+
+    @Override
+    public Optional<DatLichResponseDTO> getById(int maDL) {
+        Optional<DatLich> datLich = datLichRepository.findById(maDL);
+
+        if (datLich.isEmpty()) {
+            return Optional.empty();
+        }
+
+        List<CTDatLich> chiTiet = ctDatLichRepository.findByDatLichWithDetails(maDL);
+        return Optional.of(DatLichResponseMapper.toResponseDTO(datLich.get(), chiTiet));
+    }
 }
